@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.meta.xr.simulator": "81.0.0",
     "com.unity.feature.development": "1.0.2",
     "com.unity.ide.rider": "3.0.38",
     "com.unity.inputsystem": "1.17.0",
@@ -14,6 +15,7 @@
     "com.unity.xr.interaction.toolkit": "3.3.0",
     "com.unity.xr.management": "4.5.3",
     "com.unity.xr.mock-hmd": "1.5.0-exp.2",
+    "com.unity.xr.oculus": "4.5.2",
     "com.unity.xr.openxr": "1.16.0",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",
