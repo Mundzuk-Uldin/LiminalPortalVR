@@ -257,6 +257,12 @@ namespace Portals {
             bool isRendererEnabled = enabled && _renderer && _renderer.enabled;
             if (!isRendererEnabled) { return false; }
 
+            // Don't render if portal component is missing
+            if (_portal == null) {
+                Debug.LogError("PortalRenderer could not find Portal component in parent. Make sure PortalRenderer is a child of a GameObject with a Portal component.", this);
+                return false;
+            }
+
             // Don't render non-supported camera types (preview cameras can cause issues)
             bool isCameraSupported = (_portal.SupportedCameraTypes & camera.cameraType) == camera.cameraType;
             if (!isCameraSupported) { return false; }
@@ -349,6 +355,13 @@ namespace Portals {
             SaveMaterialProperties();
 
             Camera currentCam = Camera.current;
+
+            // Guard against null camera (can happen in editor or certain rendering contexts)
+            if (currentCam == null) {
+                RenderDefaultTexture();
+                return;
+            }
+
             if (ShouldRenderPortal(currentCam)) {
                 RenderPortal(currentCam);
             } else if (ShouldRenderPreviousFrame(currentCam)) { 
