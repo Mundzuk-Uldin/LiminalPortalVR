@@ -35,7 +35,7 @@ namespace Portals {
             raycastOccluders = ~0,
             clippingOffset = 0.01f,
             copyGlobalIllumination = false,
-            supportedCameraTypes = CameraType.Game | CameraType.SceneView | CameraType.VR | CameraType.Reflection,
+            supportedCameraTypes = CameraType.Game | CameraType.SceneView | CameraType.VR,
             debugEnabled = false
         };
 
