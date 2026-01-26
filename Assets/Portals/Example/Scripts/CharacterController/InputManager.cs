@@ -37,7 +37,7 @@ public class InputManager : MonoBehaviour {
         }
 
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.Space) || OVRInput.GetDown(OVRInput.Button.Three)) {
             _playerController.Jump();
         }
 
