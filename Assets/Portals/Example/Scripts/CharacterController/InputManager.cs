@@ -7,7 +7,8 @@ using static OVRInput;
 public class InputManager : MonoBehaviour {
     [SerializeField] float _mouseSensitivity = 3.0f;
 
-
+    private float _snapTurnCooldown = 0f;
+    [SerializeField] private float _snapTurnAngle = 30f;
 
     RigidbodyCharacterController _playerController;
     private bool _movementEnabled;
@@ -89,16 +90,49 @@ public class InputManager : MonoBehaviour {
     }
 
     void HandleVRRotation()
-    {   
+    {
+        if (!_movementEnabled) return;
+        
         Vector2 secondaryAxis = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
         
-        if (secondaryAxis.magnitude > 0.1f)
+        if (_snapTurnCooldown <= 0f)
         {
-            float xRotation = secondaryAxis.x * _mouseSensitivity;
-            float yRotation = secondaryAxis.y * _mouseSensitivity;
+            float xRotation = 0f;
+            float yRotation = 0f;
+            bool snapped = false;
             
-            _playerController.Rotate(xRotation, yRotation);
+            // Horizontal snap turn
+            if (secondaryAxis.x > 0.7f) // Right
+            {
+                xRotation = _snapTurnAngle;
+                snapped = true;
+            }
+            else if (secondaryAxis.x < -0.7f) // Left
+            {
+                xRotation = -_snapTurnAngle;
+                snapped = true;
+            }
+            
+            // Vertical snap turn
+            if (secondaryAxis.y > 0.7f) // Up
+            {
+                yRotation = _snapTurnAngle * 0.5f;
+                snapped = true;
+            }
+            else if (secondaryAxis.y < -0.7f) // Down
+            {
+                yRotation = -_snapTurnAngle * 0.5f;
+                snapped = true;
+            }
+            
+            if (snapped)
+            {
+                _playerController.Rotate(xRotation, yRotation);
+                _snapTurnCooldown = 0.35f;
+            }
         }
+        
+        _snapTurnCooldown -= Time.fixedDeltaTime;
     }
 
     void FixedUpdate() {
