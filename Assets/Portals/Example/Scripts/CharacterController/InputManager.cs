@@ -12,12 +12,19 @@ public class InputManager : MonoBehaviour {
 
     RigidbodyCharacterController _playerController;
     private bool _movementEnabled;
+    private bool _isVRMode = false;  // ← Add this
 
     void Awake() {
         _playerController = GetComponent<RigidbodyCharacterController>();
         _movementEnabled = true;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+        StartCoroutine(HandleVRMode());
+    }
+    IEnumerator HandleVRMode()
+    {
+        yield return new WaitForSeconds(1.0f);
+        _isVRMode = UnityEngine.XR.XRSettings.isDeviceActive;
     }
 
     void Update() {
@@ -36,8 +43,7 @@ public class InputManager : MonoBehaviour {
             return;
         }
 
-
-        if (Input.GetKeyDown(KeyCode.Space) || OVRInput.GetDown(OVRInput.Button.Three)) {
+        if (Input.GetKeyDown(KeyCode.Space) || OVRInput.GetDown(OVRInput.Button.One)) {
             _playerController.Jump();
         }
 
@@ -46,7 +52,7 @@ public class InputManager : MonoBehaviour {
         //}
     }
 
-    void HandleMovement() {
+    void HandlePCMovement() {
         Vector3 moveDir = Vector3.zero;
         bool moved = false;
         if (_movementEnabled) {
@@ -135,9 +141,21 @@ public class InputManager : MonoBehaviour {
         _snapTurnCooldown -= Time.fixedDeltaTime;
     }
 
+
+    void HandlePCRotation() {
+        float xRotation = Input.GetAxis("Mouse X") * _mouseSensitivity;
+        float yRotation = Input.GetAxis("Mouse Y") * _mouseSensitivity;
+
+        _playerController.Rotate(xRotation, yRotation);
+    }
+
     void FixedUpdate() {
-        HandleMovement();
-        HandleVRMovement();
-        HandleVRRotation();
+        if (_isVRMode) {
+            HandleVRMovement();
+            HandleVRRotation();
+        } else {
+            HandlePCMovement();
+            HandlePCRotation();
+        }
     }
 }
