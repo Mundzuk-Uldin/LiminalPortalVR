@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Portals;
+using static OVRInput;
 
 public class InputManager : MonoBehaviour {
     [SerializeField] float _mouseSensitivity = 3.0f;
 
-    // TODO: Remove;
-    [SerializeField] bool _autowalk = false;
 
 
     RigidbodyCharacterController _playerController;
@@ -71,17 +70,28 @@ public class InputManager : MonoBehaviour {
             }
 
         }
-        if (_autowalk) {
-            moveDir += Camera.main.transform.forward;
-            moved = true;
-        }
 
         if (moved) {
             _playerController.Move(moveDir);
         }
     }
+    void HandleVRMovement()
+    {
+        if (!_movementEnabled) return;
+        Debug.Log($"VR Input: {OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick)}");
+        Debug.Log($"Controller Connected: {OVRInput.GetConnectedControllers()}");
+        Vector2 primaryAxis = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
+        
+        // Only move if stick is pushed beyond dead zone
+        if (primaryAxis.magnitude > 0.1f)
+        {
+            Vector3 moveDir = (Camera.main.transform.forward * primaryAxis.y) + 
+                            (Camera.main.transform.right * primaryAxis.x);
+            _playerController.Move(moveDir);
+        }
+    }
 
     void FixedUpdate() {
-        HandleMovement();
+        HandleVRMovement();
     }
 }

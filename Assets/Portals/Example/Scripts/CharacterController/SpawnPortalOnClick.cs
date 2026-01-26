@@ -60,10 +60,10 @@ public class SpawnPortalOnClick : MonoBehaviour {
     }
 
     void Update () {
-        bool leftClick = Input.GetMouseButtonDown(0);
-        bool rightClick = Input.GetMouseButtonDown(1);
-/*         bool leftClick = OVRInput.GetDown(OVRInput.Button.One);
-        bool rightClick = OVRInput.GetDown(OVRInput.Button.Two); */
+/*         bool leftClick = Input.GetMouseButtonDown(0);
+        bool rightClick = Input.GetMouseButtonDown(1); */
+        bool leftClick = OVRInput.GetDown(OVRInput.Button.One);
+        bool rightClick = OVRInput.GetDown(OVRInput.Button.Two);
 
         if (leftClick || rightClick) {
             Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
