@@ -35,9 +35,6 @@ public class InputManager : MonoBehaviour {
             return;
         }
 
-        float xRotation = Input.GetAxis("Mouse X") * _mouseSensitivity;
-        float yRotation = Input.GetAxis("Mouse Y") * _mouseSensitivity;
-        _playerController.Rotate(xRotation, yRotation);
 
         if (Input.GetKeyDown(KeyCode.Space)) {
             _playerController.Jump();
@@ -78,8 +75,8 @@ public class InputManager : MonoBehaviour {
     void HandleVRMovement()
     {
         if (!_movementEnabled) return;
-        Debug.Log($"VR Input: {OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick)}");
-        Debug.Log($"Controller Connected: {OVRInput.GetConnectedControllers()}");
+/*         Debug.Log($"VR Input: {OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick)}");
+        Debug.Log($"Controller Connected: {OVRInput.GetConnectedControllers()}"); */
         Vector2 primaryAxis = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
         
         // Only move if stick is pushed beyond dead zone
@@ -91,7 +88,22 @@ public class InputManager : MonoBehaviour {
         }
     }
 
+    void HandleVRRotation()
+    {   
+        Vector2 secondaryAxis = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+        
+        if (secondaryAxis.magnitude > 0.1f)
+        {
+            float xRotation = secondaryAxis.x * _mouseSensitivity;
+            float yRotation = secondaryAxis.y * _mouseSensitivity;
+            
+            _playerController.Rotate(xRotation, yRotation);
+        }
+    }
+
     void FixedUpdate() {
+        HandleMovement();
         HandleVRMovement();
+        HandleVRRotation();
     }
 }
