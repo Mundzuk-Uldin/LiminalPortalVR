@@ -59,13 +59,7 @@ public class SpawnPortalOnClick : MonoBehaviour {
 
     }
 
-    void Update ()
-    {
-        FirePortalPC();
-        FirePortalVR();
-    }
-    void FirePortalPC()
-    {
+    void Update () {
         bool leftClick = Input.GetMouseButtonDown(0);
         bool rightClick = Input.GetMouseButtonDown(1);
 
@@ -73,17 +67,7 @@ public class SpawnPortalOnClick : MonoBehaviour {
             Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
             Fire(polarity);
         }
-    }
-    void FirePortalVR()
-    {
-                bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
-        bool rightClick = OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger);
-
-        if (leftClick || rightClick) {
-            Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
-            Fire(polarity);
-        }
-    }
+	}
 
     private enum Polarity {
         Left,

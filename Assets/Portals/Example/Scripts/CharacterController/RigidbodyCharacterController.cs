@@ -192,7 +192,7 @@ namespace Portals {
 
         public void Jump() {
             float scaleFactor = this.transform.localScale.x;
-            _rigidbody.AddForce(_movementInfo.jumpForce * 0.25f * scaleFactor * this.UpVector, ForceMode.Acceleration);
+            _rigidbody.AddForce(this.UpVector * _movementInfo.jumpForce * scaleFactor, ForceMode.Acceleration);
         }
     }
 }

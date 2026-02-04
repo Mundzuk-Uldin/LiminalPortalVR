@@ -33,7 +33,7 @@ namespace Portals {
 
         private void Update() {
             if (_camera.stereoEnabled) {
-                Debug.Log("Setting field of view not supported in VR. Disabling script.");
+                Debug.LogError("Setting field of view not supported in VR. Disabling script.");
                 this.enabled = false;
                 return;
             }

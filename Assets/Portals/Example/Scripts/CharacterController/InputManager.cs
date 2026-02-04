@@ -2,29 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Portals;
-using static OVRInput;
 
 public class InputManager : MonoBehaviour {
     [SerializeField] float _mouseSensitivity = 3.0f;
 
-    private float _snapTurnCooldown = 0f;
-    [SerializeField] private float _snapTurnAngle = 30f;
+    // TODO: Remove;
+    [SerializeField] bool _autowalk = false;
+
 
     RigidbodyCharacterController _playerController;
     private bool _movementEnabled;
-    private bool _isVRMode = false;  // ← Add this
 
     void Awake() {
         _playerController = GetComponent<RigidbodyCharacterController>();
         _movementEnabled = true;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        StartCoroutine(HandleVRMode());
-    }
-    IEnumerator HandleVRMode()
-    {
-        yield return new WaitForSeconds(1.0f);
-        _isVRMode = UnityEngine.XR.XRSettings.isDeviceActive;
     }
 
     void Update() {
@@ -43,7 +36,11 @@ public class InputManager : MonoBehaviour {
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) || OVRInput.GetDown(OVRInput.Button.One)) {
+        float xRotation = Input.GetAxis("Mouse X") * _mouseSensitivity;
+        float yRotation = Input.GetAxis("Mouse Y") * _mouseSensitivity;
+        _playerController.Rotate(xRotation, yRotation);
+
+        if (Input.GetKeyDown(KeyCode.Space)) {
             _playerController.Jump();
         }
 
@@ -52,7 +49,7 @@ public class InputManager : MonoBehaviour {
         //}
     }
 
-    void HandlePCMovement() {
+    void HandleMovement() {
         Vector3 moveDir = Vector3.zero;
         bool moved = false;
         if (_movementEnabled) {
@@ -74,88 +71,17 @@ public class InputManager : MonoBehaviour {
             }
 
         }
+        if (_autowalk) {
+            moveDir += Camera.main.transform.forward;
+            moved = true;
+        }
 
         if (moved) {
             _playerController.Move(moveDir);
         }
     }
-    void HandleVRMovement()
-    {
-        if (!_movementEnabled) return;
-/*         Debug.Log($"VR Input: {OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick)}");
-        Debug.Log($"Controller Connected: {OVRInput.GetConnectedControllers()}"); */
-        Vector2 primaryAxis = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
-        
-        // Only move if stick is pushed beyond dead zone
-        if (primaryAxis.magnitude > 0.1f)
-        {
-            Vector3 moveDir = (Camera.main.transform.forward * primaryAxis.y) + 
-                            (Camera.main.transform.right * primaryAxis.x);
-            _playerController.Move(moveDir);
-        }
-    }
-
-    void HandleVRRotation()
-    {
-        if (!_movementEnabled) return;
-        
-        Vector2 secondaryAxis = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
-        
-        if (_snapTurnCooldown <= 0f)
-        {
-            float xRotation = 0f;
-            float yRotation = 0f;
-            bool snapped = false;
-            
-            // Horizontal snap turn
-            if (secondaryAxis.x > 0.7f) // Right
-            {
-                xRotation = _snapTurnAngle;
-                snapped = true;
-            }
-            else if (secondaryAxis.x < -0.7f) // Left
-            {
-                xRotation = -_snapTurnAngle;
-                snapped = true;
-            }
-            
-            // Vertical snap turn
-            if (secondaryAxis.y > 0.7f) // Up
-            {
-                yRotation = _snapTurnAngle * 0.5f;
-                snapped = true;
-            }
-            else if (secondaryAxis.y < -0.7f) // Down
-            {
-                yRotation = -_snapTurnAngle * 0.5f;
-                snapped = true;
-            }
-            
-            if (snapped)
-            {
-                _playerController.Rotate(xRotation, yRotation);
-                _snapTurnCooldown = 0.35f;
-            }
-        }
-        
-        _snapTurnCooldown -= Time.fixedDeltaTime;
-    }
-
-
-    void HandlePCRotation() {
-        float xRotation = Input.GetAxis("Mouse X") * _mouseSensitivity;
-        float yRotation = Input.GetAxis("Mouse Y") * _mouseSensitivity;
-
-        _playerController.Rotate(xRotation, yRotation);
-    }
 
     void FixedUpdate() {
-        if (_isVRMode) {
-            HandleVRMovement();
-            HandleVRRotation();
-        } else {
-            HandlePCMovement();
-            HandlePCRotation();
-        }
+        HandleMovement();
     }
 }
