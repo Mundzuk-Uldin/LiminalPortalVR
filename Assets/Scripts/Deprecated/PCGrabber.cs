@@ -86,6 +86,7 @@ public class PCGrabber : MonoBehaviour
     {
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
+        print("player pos:" + playerCamera.transform.position.ToString());
         if (!Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance, grabbableMask, triggerInteraction))
             return;
 
