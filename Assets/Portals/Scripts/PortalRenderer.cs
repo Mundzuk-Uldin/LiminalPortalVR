@@ -12,7 +12,7 @@ namespace Portals {
 
     [ExecuteInEditMode]
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-    public class PortalRenderer : RenderedBehaviour {
+    public class PortalRenderer : MonoBehaviour {
         #region Members
         // Mesh spawned when walking through a portal so that you can't clip through the portal
         private static Mesh _mesh;
@@ -217,7 +217,7 @@ namespace Portals {
             }
 
             Vector3 origin = camera.transform.position;
-            PortalCamera pc = PortalCamera.current;
+            PortalCamera pc = PortalCamera.Get(camera);
 
             var corners = portal.WorldSpaceCorners;
             for (int i = 0; i < corners.Length; i++) {
@@ -350,39 +350,15 @@ namespace Portals {
 #endif
         }
 
-        protected override void PreRender() {
-            InitializeIfNeeded();
-            SaveMaterialProperties();
 
-            Camera currentCam = Camera.current;
 
-            // Guard against null camera (can happen in editor or certain rendering contexts)
-            if (currentCam == null) {
-                RenderDefaultTexture();
-                return;
-            }
-
-            if (ShouldRenderPortal(currentCam)) {
-                RenderPortal(currentCam);
-            } else if (ShouldRenderPreviousFrame(currentCam)) { 
-                RenderPreviousFrame(currentCam);
-            } else {
-                RenderDefaultTexture();
-            }
-        }
-
-        protected override void PostRender() {
-            _renderer.enabled = true;
-            RestoreMaterialProperties();
-        }
-
-        private void RenderPortal(Camera currentCam) {
+        private void RenderPortal(Camera currentCam, ScriptableRenderContext context) {
             MaterialPropertyBlock block = _propertyBlockObjectPool.Take();
             _renderer.GetPropertyBlock(block);
 
             // Calculate where in screen space the portal lies.
             // We use this to only render as much of the screen as necessary, avoiding overdraw.
-            Rect viewportRect = CalculatePortalViewportRect(Camera.current);
+            Rect viewportRect = CalculatePortalViewportRect(currentCam);
 
             // Viewport must be at least one pixel wide
             float pixelWidth = viewportRect.width * currentCam.pixelWidth;
@@ -392,29 +368,31 @@ namespace Portals {
             }
 
             // Handle the player clipping through the portal's frontface
-            bool renderBackface = ShouldRenderBackface(Camera.current);
+            bool renderBackface = ShouldRenderBackface(currentCam);
             block.SetFloat("_BackfaceAlpha", renderBackface ? 1.0f : 0.0f);
 
             // Get camera for next depth level
-            PortalCamera portalCamera = GetOrCreatePortalCamera(Camera.current);
+            PortalCamera portalCamera = GetOrCreatePortalCamera(currentCam);
 
             // Save which portal is rendering 
             var parentPortal = _currentlyRenderingPortal;
             _currentlyRenderingPortal = _portal;
             _currentRenderDepth++;
-            if (Camera.current.stereoEnabled) {
+            
+            // Use currentCam for stereo checking instead of Camera.current which might be unreliable in this context
+            if (currentCam.stereoEnabled) {
                 // Stereo rendering. Render both eyes.
-                if (Camera.current.stereoTargetEye == StereoTargetEyeMask.Both || Camera.current.stereoTargetEye == StereoTargetEyeMask.Left) {
-                    RenderTexture tex = portalCamera.RenderToTexture(Camera.MonoOrStereoscopicEye.Left, viewportRect, renderBackface);
+                if (currentCam.stereoTargetEye == StereoTargetEyeMask.Both || currentCam.stereoTargetEye == StereoTargetEyeMask.Left) {
+                    RenderTexture tex = portalCamera.RenderToTexture(Camera.MonoOrStereoscopicEye.Left, viewportRect, renderBackface, context);
                     block.SetTexture("_LeftEyeTexture", tex);
                 }
-                if (Camera.current.stereoTargetEye == StereoTargetEyeMask.Both || Camera.current.stereoTargetEye == StereoTargetEyeMask.Right) {
-                    RenderTexture tex = portalCamera.RenderToTexture(Camera.MonoOrStereoscopicEye.Right, viewportRect, renderBackface);
+                if (currentCam.stereoTargetEye == StereoTargetEyeMask.Both || currentCam.stereoTargetEye == StereoTargetEyeMask.Right) {
+                    RenderTexture tex = portalCamera.RenderToTexture(Camera.MonoOrStereoscopicEye.Right, viewportRect, renderBackface, context);
                     block.SetTexture("_RightEyeTexture", tex);
                 }
             } else {
                 // Mono rendering. Render only one eye, but set which texture to use based on the camera's target eye.
-                RenderTexture tex = portalCamera.RenderToTexture(Camera.MonoOrStereoscopicEye.Mono, viewportRect, renderBackface);
+                RenderTexture tex = portalCamera.RenderToTexture(Camera.MonoOrStereoscopicEye.Mono, viewportRect, renderBackface, context);
                 block.SetTexture("_LeftEyeTexture", tex);
             }
             _currentRenderDepth--;
@@ -426,7 +404,13 @@ namespace Portals {
 
 
         private void RenderPreviousFrame(Camera currentCam) {
-            PortalCamera portalCam = PortalCamera.current;
+            PortalCamera portalCam = PortalCamera.Get(currentCam);
+
+            if (portalCam == null) {
+                // If we can't find the portal camera, we can't render the previous frame
+                RenderDefaultTexture();
+                return;
+            }
 
             // Use the previous frame's RenderTexture from the parent camera to render the bottom layer.
             // This creates an illusion of infinite recursion, but only works with at least two real recursions
@@ -528,16 +512,18 @@ namespace Portals {
             _portal.OnDefaultTextureChanged += OnDefaultTextureChanged;
             _portal.OnTransparencyMaskChanged += OnTransparencyMaskChanged;
 
-            if (_activePortalRendererCount == 0) {
-                Camera.onPreRender += SetCurrentEyeGlobal;
-                Camera.onPostRender += RestoreCurrentEyeGlobal;
-            }
+            RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
+            RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+
             _activePortalRendererCount += 1;
         }
 
         private void OnDisable() {
             _portal.OnDefaultTextureChanged -= OnDefaultTextureChanged;
             _portal.OnTransparencyMaskChanged -= OnTransparencyMaskChanged;
+
+            RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+            RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
 
             // Clean up cameras in scene. This is important when using ExecuteInEditMode because
             // script recompilation will disable then enable this script causing creation of duplicate
@@ -550,18 +536,52 @@ namespace Portals {
             }
 
             _activePortalRendererCount -= 1;
-            if (_activePortalRendererCount == 0) {
-                Camera.onPreRender -= SetCurrentEyeGlobal;
-                Camera.onPostRender -= RestoreCurrentEyeGlobal;
-            }
         }
         #endregion
 
-        ////private void Update() {
-        ////    m_Transform.localScale = Vector3.one;
-        ////}
-        
         #region Callbacks
+        private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) {
+            // Ignore preview cameras, reflection probes, etc. if needed, or let ShouldRenderPortal handle it.
+            if (camera.cameraType == CameraType.Preview) return;
+
+            // Manual Culling: Check if the portal is actually visible to this camera.
+            // Since we are not using OnWillRenderObject, we don't get free frustum culling.
+            if (!IsVisible(camera)) {
+                return;
+            }
+
+            InitializeIfNeeded();
+            SaveMaterialProperties();
+
+            if (ShouldRenderPortal(camera)) {
+                RenderPortal(camera, context);
+            } else if (ShouldRenderPreviousFrame(camera)) { 
+                RenderPreviousFrame(camera);
+            } else {
+                RenderDefaultTexture();
+            }
+        }
+
+        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
+            if (camera.cameraType == CameraType.Preview) return;
+            
+            // If we didn't save properties (because we culled early), don't try to restore.
+            // We can track this with a set or simple check if stack is empty (though stack is shared across recursions).
+            // Better: IsVisible check matches OnBeginCameraRendering.
+            if (!IsVisible(camera)) {
+                return;
+            }
+
+            _renderer.enabled = true;
+            RestoreMaterialProperties();
+        }
+
+        private bool IsVisible(Camera camera) {
+            // Simple bounding box check against camera frustum
+            Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+            return GeometryUtility.TestPlanesAABB(planes, _renderer.bounds);
+        }
+
         private void OnDefaultTextureChanged(Portal portal, Texture oldTexture, Texture newTexture) {
             _portalMaterial.SetTexture("_DefaultTexture", newTexture);
             _backfaceMaterial.SetTexture("_DefaultTexture", newTexture);
@@ -572,20 +592,6 @@ namespace Portals {
             _backfaceMaterial.SetTexture("_TransparencyMask", newTexture);
         }
 
-
-        private static Stack<float> eyeStack = new Stack<float>();
-        private static void SetCurrentEyeGlobal(Camera cam) {
-            eyeStack.Push(Shader.GetGlobalFloat("_PortalMultiPassCurrentEye"));
-            // Globally set the current eye for Multi-Pass stereo rendering.
-            // We also run this code in Single-Pass rendering because Unity doesn't have a runtime
-            // check for single/multi-pass stereo, but the value gets ignored.
-            Shader.SetGlobalFloat("_PortalMultiPassCurrentEye", (int)cam.stereoActiveEye);
-        }
-
-        private static void RestoreCurrentEyeGlobal(Camera cam) {
-            float eye = eyeStack.Pop();
-            Shader.SetGlobalFloat("_PortalMultiPassCurrentEye", eye);
-        }
         #endregion
 
         #region Private Methods

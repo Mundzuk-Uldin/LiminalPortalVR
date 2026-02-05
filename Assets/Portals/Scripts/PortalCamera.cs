@@ -26,7 +26,9 @@ namespace Portals {
         public static PortalCamera current {
             get {
                 PortalCamera c = null;
-                cameraMap.TryGetValue(Camera.current, out c);
+                if (Camera.current != null) {
+                    cameraMap.TryGetValue(Camera.current, out c);
+                }
                 return c;
             }
         }
@@ -150,8 +152,8 @@ namespace Portals {
         }
         
         private RenderTexture GetTemporaryRT() {
-            int w = Camera.current.pixelWidth / _portal.Downscaling;
-            int h = Camera.current.pixelHeight / _portal.Downscaling;
+            int w = _parent.pixelWidth / _portal.Downscaling;
+            int h = _parent.pixelHeight / _portal.Downscaling;
             //int w = Screen.width;
             //int h = Screen.height;
             int depth = (int)_portal.DepthBufferQuality;
@@ -172,7 +174,14 @@ namespace Portals {
             return rt;
         }
 
-        public RenderTexture RenderToTexture(Camera.MonoOrStereoscopicEye eye, Rect viewportRect, bool renderBackface) {
+        public static PortalCamera Get(Camera camera) {
+            if (cameraMap.TryGetValue(camera, out PortalCamera c)) {
+                return c;
+            }
+            return null;
+        }
+
+        public RenderTexture RenderToTexture(Camera.MonoOrStereoscopicEye eye, Rect viewportRect, bool renderBackface, ScriptableRenderContext context) {
             _framesSinceLastUse = 0;
 
             // Copy parent camera's settings
@@ -247,7 +256,9 @@ namespace Portals {
             }
 
             _camera.targetTexture = texture;
-            _camera.Render();
+            
+            // Render with URP
+            UnityEngine.Rendering.Universal.UniversalRenderPipeline.RenderSingleCamera(context, _camera);
 
             SaveFrameData(eye);
 
@@ -289,6 +300,28 @@ namespace Portals {
             if (!dst.stereoEnabled) {
                 // Can't set FoV while in VR
                 dst.fieldOfView = src.fieldOfView;
+            }
+
+            // URP Specific Data Copy
+            var srcData = src.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            var dstData = dst.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+
+            if (dstData == null) {
+                dstData = dst.gameObject.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            }
+
+            if (srcData && dstData) {
+                dstData.renderType = srcData.renderType;
+                dstData.volumeLayerMask = srcData.volumeLayerMask;
+                dstData.renderShadows = srcData.renderShadows;
+                dstData.requiresColorOption = srcData.requiresColorOption;
+                dstData.requiresDepthOption = srcData.requiresDepthOption;
+                // dstData.antialiasing = srcData.antialiasing; // Can cause issues if mismatched hardware support
+                dstData.renderPostProcessing = srcData.renderPostProcessing;
+                
+                // Important: Camera stack must be cleared/managed to avoid recursion issues if the source has a stack
+                // For portals, we usually just want the base camera render.
+                // dstData.cameraStack = ...
             }
         }
 

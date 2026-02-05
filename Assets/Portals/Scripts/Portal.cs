@@ -280,12 +280,13 @@ namespace Portals {
         /// </summary>
         public Vector3[] WorldSpaceCorners {
             get {
-                if (transform.hasChanged) {
+                if (_cornerBuffer == null || _cornerBuffer.Length != 4 || transform.hasChanged) {
                     Vector3 topLeft = transform.TransformPoint(new Vector3(-0.5f, 0.5f));
                     Vector3 topRight = transform.TransformPoint(new Vector3(0.5f, 0.5f));
                     Vector3 bottomRight = transform.TransformPoint(new Vector3(0.5f, -0.5f));
                     Vector3 bottomLeft = transform.TransformPoint(new Vector3(-0.5f, -0.5f));
-                    if (_cornerBuffer == null) {
+
+                    if (_cornerBuffer == null || _cornerBuffer.Length != 4) {
                         _cornerBuffer = new Vector3[4];
                     }
                     _cornerBuffer[0] = topLeft;
