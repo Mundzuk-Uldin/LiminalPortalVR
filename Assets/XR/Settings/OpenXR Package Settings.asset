@@ -1157,7 +1157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f0ebc320a151d3408ea1e9fce54d40e, type: 3}
   m_Name: OpenXR Package Settings
   m_EditorClassIdentifier: 
-  Keys: 01000000040000000700000020000000240000000e000000
+  Keys: 0100000004000000070000002000000024000000
   Values:
   - {fileID: -3525914795011976567}
   - {fileID: -5214936325388654171}
@@ -1399,25 +1399,25 @@ MonoBehaviour:
   m_Name: Metro
   m_EditorClassIdentifier: Unity.XR.OpenXR::UnityEngine.XR.OpenXR.OpenXRSettings
   features:
-  - {fileID: 3707260833379504063}
+  - {fileID: 0}
   - {fileID: -7748481219418675995}
-  - {fileID: 8848888689877396199}
+  - {fileID: 0}
   - {fileID: -2476056653497584499}
-  - {fileID: -3277382873769623954}
-  - {fileID: 6366309440393473767}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: -3947766775338186132}
-  - {fileID: 1296524001975236100}
+  - {fileID: 0}
   - {fileID: -4114760282306142776}
   - {fileID: 654903497087761219}
-  - {fileID: 8361123291830099511}
+  - {fileID: 0}
   - {fileID: 7981363444250589794}
-  - {fileID: 4410422654703211223}
-  - {fileID: 1423482314277885020}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 7672002532633155522}
   - {fileID: -6959168428622949383}
-  - {fileID: 4571664691988681362}
+  - {fileID: 0}
   - {fileID: -6664960735257176405}
-  - {fileID: 8127040402280705378}
+  - {fileID: 0}
   customLoaderName: 
   m_renderMode: 1
   m_latencyOptimization: 0
