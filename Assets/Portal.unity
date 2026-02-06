@@ -1895,10 +1895,6 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 777225326, guid: 1ab5cb48923d141458acd2b58536cf58, type: 3}
-      propertyPath: volumeLayer.m_Bits
-      value: 128
-      objectReference: {fileID: 0}
     - target: {fileID: 777225327, guid: 1ab5cb48923d141458acd2b58536cf58, type: 3}
       propertyPath: m_Enabled
       value: 0

@@ -67,7 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "LiminalPortalVR.slnx",
-    "bg3ModHelper.rootModPath": "j:\\Some Unity game\\LiminalPortalVR",
-    "bg3ModHelper.packingPriority": 0
+    "dotnet.defaultSolution": "PortalVR.slnx"
 }
