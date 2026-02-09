@@ -256,9 +256,17 @@ namespace Portals {
             }
 
             _camera.targetTexture = texture;
-            
+
+            // Explicitly render all portals for this camera to support recursive rendering.
+            // URP's RenderSingleCamera may not fire beginCameraRendering in all versions,
+            // so we trigger portal rendering manually before the scene is drawn.
+            PortalRenderer.RenderPortalsForCamera(context, _camera);
+
             // Render with URP
             UnityEngine.Rendering.Universal.UniversalRenderPipeline.RenderSingleCamera(context, _camera);
+
+            // Restore portal material states after rendering
+            PortalRenderer.EndRenderPortalsForCamera(context, _camera);
 
             SaveFrameData(eye);
 

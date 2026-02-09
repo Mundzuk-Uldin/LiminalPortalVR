@@ -32,6 +32,10 @@ namespace Portals {
         // Used to track current recursion depth
         private static int _currentRenderDepth;
 
+        // Tracks cameras that have been explicitly rendered to prevent double-processing
+        // when URP's RenderSingleCamera also fires beginCameraRendering
+        private static HashSet<Camera> _explicitlyRenderedCameras = new HashSet<Camera>();
+
         // Instanced materials
         private Material _portalMaterial;
         private Material _backfaceMaterial;
@@ -464,6 +468,60 @@ namespace Portals {
             _portalMaterial.DisableKeyword("SAMPLE_PREVIOUS_FRAME");
             _portalMaterial.EnableKeyword("SAMPLE_DEFAULT_TEXTURE");
         }
+
+        /// <summary>
+        /// Explicitly renders all portals for the given camera. Called by PortalCamera before
+        /// RenderSingleCamera to ensure recursive portal rendering works in URP, which may
+        /// not fire beginCameraRendering for manually rendered cameras.
+        /// </summary>
+        public static void RenderPortalsForCamera(ScriptableRenderContext context, Camera camera) {
+            _explicitlyRenderedCameras.Add(camera);
+            for (int i = 0; i < Portal.AllPortals.Count; i++) {
+                var portal = Portal.AllPortals[i];
+                if (portal == null) continue;
+                var renderer = portal.PortalRenderer;
+                if (renderer == null) continue;
+                renderer.BeginRenderForCamera(context, camera);
+            }
+        }
+
+        /// <summary>
+        /// Restores material properties for all portals after rendering.
+        /// </summary>
+        public static void EndRenderPortalsForCamera(ScriptableRenderContext context, Camera camera) {
+            for (int i = 0; i < Portal.AllPortals.Count; i++) {
+                var portal = Portal.AllPortals[i];
+                if (portal == null) continue;
+                var renderer = portal.PortalRenderer;
+                if (renderer == null) continue;
+                renderer.EndRenderForCamera(context, camera);
+            }
+            _explicitlyRenderedCameras.Remove(camera);
+        }
+
+        private void BeginRenderForCamera(ScriptableRenderContext context, Camera camera) {
+            if (camera.cameraType == CameraType.Preview) return;
+            if (!IsVisible(camera)) return;
+
+            InitializeIfNeeded();
+            SaveMaterialProperties();
+
+            if (ShouldRenderPortal(camera)) {
+                RenderPortal(camera, context);
+            } else if (ShouldRenderPreviousFrame(camera)) {
+                RenderPreviousFrame(camera);
+            } else {
+                RenderDefaultTexture();
+            }
+        }
+
+        private void EndRenderForCamera(ScriptableRenderContext context, Camera camera) {
+            if (camera.cameraType == CameraType.Preview) return;
+            if (!IsVisible(camera)) return;
+
+            _renderer.enabled = true;
+            RestoreMaterialProperties();
+        }
         #endregion
 
         #region Initialization
@@ -541,39 +599,15 @@ namespace Portals {
 
         #region Callbacks
         private void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera) {
-            // Ignore preview cameras, reflection probes, etc. if needed, or let ShouldRenderPortal handle it.
-            if (camera.cameraType == CameraType.Preview) return;
-
-            // Manual Culling: Check if the portal is actually visible to this camera.
-            // Since we are not using OnWillRenderObject, we don't get free frustum culling.
-            if (!IsVisible(camera)) {
-                return;
-            }
-
-            InitializeIfNeeded();
-            SaveMaterialProperties();
-
-            if (ShouldRenderPortal(camera)) {
-                RenderPortal(camera, context);
-            } else if (ShouldRenderPreviousFrame(camera)) { 
-                RenderPreviousFrame(camera);
-            } else {
-                RenderDefaultTexture();
-            }
+            // Skip if this camera was already handled by explicit recursive rendering
+            if (_explicitlyRenderedCameras.Contains(camera)) return;
+            BeginRenderForCamera(context, camera);
         }
 
         private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera) {
-            if (camera.cameraType == CameraType.Preview) return;
-            
-            // If we didn't save properties (because we culled early), don't try to restore.
-            // We can track this with a set or simple check if stack is empty (though stack is shared across recursions).
-            // Better: IsVisible check matches OnBeginCameraRendering.
-            if (!IsVisible(camera)) {
-                return;
-            }
-
-            _renderer.enabled = true;
-            RestoreMaterialProperties();
+            // Skip if this camera was already handled by explicit recursive rendering
+            if (_explicitlyRenderedCameras.Contains(camera)) return;
+            EndRenderForCamera(context, camera);
         }
 
         private bool IsVisible(Camera camera) {
