@@ -159,7 +159,7 @@ namespace Portals {
             int depth = (int)_portal.DepthBufferQuality;
             var format = _camera.allowHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default;
             var writeMode = RenderTextureReadWrite.Default;
-            int msaaSamples = QualitySettings.antiAliasing > 0 ? QualitySettings.antiAliasing : 1;
+            int msaaSamples = 1; // Force 1 sample to avoid resolve issues in URP recursion
             var memoryless = RenderTextureMemoryless.None;
             var vrUsage = VRTextureUsage.None;
             bool useDynamicScale = false;
@@ -316,8 +316,8 @@ namespace Portals {
                 dstData.renderShadows = srcData.renderShadows;
                 dstData.requiresColorOption = srcData.requiresColorOption;
                 dstData.requiresDepthOption = srcData.requiresDepthOption;
-                // dstData.antialiasing = srcData.antialiasing; // Can cause issues if mismatched hardware support
-                dstData.renderPostProcessing = srcData.renderPostProcessing;
+                dstData.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.None;
+                dstData.renderPostProcessing = false; // Disable post-processing to avoid "Not inside a Renderpass" errors
                 
                 // Important: Camera stack must be cleared/managed to avoid recursion issues if the source has a stack
                 // For portals, we usually just want the base camera render.
