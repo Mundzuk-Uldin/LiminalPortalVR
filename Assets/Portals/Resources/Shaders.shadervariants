@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!200 &20000000
+ShaderVariantCollection:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Shaders
+  m_Shaders:
+  - first: {fileID: 4800000, guid: f919f642bd5df034c9810c0bba3ec5a5, type: 3}
+    second:
+      variants: []
+  - first: {fileID: 4800000, guid: d2ef8b0cc3a819440ace759419da66cc, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+      - keywords: SAMPLE_DEFAULT_TEXTURE
+        passType: 0
+      - keywords: SAMPLE_PREVIOUS_FRAME
+        passType: 0
+      - keywords: 
+        passType: 8
+  - first: {fileID: 4800000, guid: 1e5c00d9f8f57f747a02870e4a0f3f56, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+      - keywords: SAMPLE_DEFAULT_TEXTURE
+        passType: 0
+      - keywords: SAMPLE_PREVIOUS_FRAME
+        passType: 0

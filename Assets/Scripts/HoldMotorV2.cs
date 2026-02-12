@@ -10,6 +10,8 @@ public class HoldMotorV2 : MonoBehaviour
     [SerializeField] private float maxGrabDistance = 5f;
     [SerializeField] private LayerMask grabbableMask;
 
+    [SerializeField] private CharacterController characterController;
+
     [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
 
     [Header("Layers")]
@@ -28,6 +30,8 @@ public class HoldMotorV2 : MonoBehaviour
     [SerializeField] private float backstep = 0.02f;
     [SerializeField] private int maxBacksteps = 120;
     [SerializeField] private float minDistance = 0.25f; // prevents pulling behind/into camera
+
+    // [SerializeField] private float extraPlayerPadding = 0.05f;
 
     private float maxRayDistance = 500;
     // [SerializeField] private bool allowForcedPerspective;
@@ -60,7 +64,7 @@ public class HoldMotorV2 : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void Update()
+    private void LateUpdate()
     {
         // If the held object was destroyed while holding, drop state safely.
 
@@ -74,6 +78,11 @@ public class HoldMotorV2 : MonoBehaviour
 
 
         KeepHold(); /// keeps the hold!!!
+    }
+
+    public Collider[] GetPlayerColliders()
+    {
+        return GetComponentsInChildren<Collider>();
     }
 
     private Vector3 GetRayOrigin()
@@ -161,6 +170,9 @@ public class HoldMotorV2 : MonoBehaviour
         print("are we holding? " + IsHolding.ToString());
         // currentOriginalLayer = holdable.gameObject.layer;
 
+        current.DisablePlayerCollision(GetPlayerColliders());
+        current.DisablePhysicsForHold();
+
         
 
     }
@@ -193,8 +205,10 @@ public class HoldMotorV2 : MonoBehaviour
                 desiredGrabPoint - worldGrabOffset;
 
             // 6) Apply pose
-            current.SetPosition(desiredPosition);
-            current.SetRotation(desiredRotation);
+            // current.SetPosition(desiredPosition);
+            // current.SetRotation(desiredRotation);
+            // current.SetPoseSmooth(desiredPosition, desiredRotation);
+            current.StepPose_Tight(desiredPosition, desiredRotation);
         }
 
         
@@ -214,10 +228,20 @@ public class HoldMotorV2 : MonoBehaviour
 
         if (hi < minDistance) hi = minDistance;
 
-        print("are we scalin? " + hi);
+        // print("are we scalin? " + hi);
 
         float lo = minDistance;
+        
+        float playerMin = GetPlayerMinHoldDistance(); 
+        lo = Mathf.Max(lo, playerMin);
+        hi = Mathf.Max(hi, playerMin);
 
+        if (hi <= lo + 0.0001f)
+        {
+            // Range collapsed to the minimum safe distance.
+            // We'll just test lo below (your existing lo test handles overlap).
+            hi = lo;
+        }
         // First ensure lo is actually free. If not, don't move this frame.
         Vector3 loScale = GetDesiredScale(lo);
         float loFactor = loScale.x / initialLocalScale.x;
@@ -225,12 +249,12 @@ public class HoldMotorV2 : MonoBehaviour
         Vector3 loGrabPoint = ray.origin + ray.direction * lo;
         Vector3 loOffset = desiredRotation * (grabbedLocalPoint * loFactor);
         Vector3 loPos = loGrabPoint - loOffset;
-        print("step 1");
+        // print("step 1");
 
         if (IsOverlapping(loPos, desiredRotation, loFactor))
             return; // nowhere valid to place
         
-        print("step 2");
+        // print("step 2");
         // Binary search for closest valid position
         float best = lo;
 
@@ -268,8 +292,9 @@ public class HoldMotorV2 : MonoBehaviour
 
         print("did we even get here?");
         current.SetLocalScale(finalScale);
-        current.SetPosition(finalPos);
-        current.SetRotation(desiredRotation);
+        // current.SetPosition(finalPos);
+        // current.SetRotation(desiredRotation);
+        current.StepPose_Tight(finalPos, desiredRotation);
         /*
         for (int i = 0; i < maxBacksteps; i++)
         {
@@ -400,6 +425,7 @@ public class HoldMotorV2 : MonoBehaviour
     }
 
 
+
     private void CleanupHold()
     {
         current = null;
@@ -407,7 +433,9 @@ public class HoldMotorV2 : MonoBehaviour
     public void EndHold()
     {
         if (current == null) return;
-        
+
+        current.EnablePhysicsAfterHold();
+        current.EnablePlayerCollision(GetPlayerColliders());
         // current.OnRelease();
         CleanupHold();
         print("are we holding? " + IsHolding.ToString());
@@ -422,6 +450,34 @@ public class HoldMotorV2 : MonoBehaviour
         float t = currentDistance / initialHoldDistance;
         return initialLocalScale * t;
     }   
+    
+
+    private float GetPlayerMinHoldDistance()
+    {
+        float playerRadius = characterController != null ? characterController.radius : 0.35f;
+        float skin = characterController != null ? characterController.skinWidth : 0.02f;
+
+        // Conservative: use current object radius at current scale.
+        // If your scale is uniform and you have current scale available, multiply it here.
+        float objRadius = current.GetCollisionRadius();
+
+        return playerRadius + skin + objRadius; // + playerPadding;
+    }
+
+    // private float GetMinHoldDistance(float objectRadiusScaled)
+    // {
+    //     float playerRadius = 0.35f; // fallback
+    //     float skin = 0.02f;
+
+    //     if (characterController != null)
+    //     {
+    //         playerRadius = characterController.radius;
+    //         skin = characterController.skinWidth;
+    //     }
+
+    //     // Keep held object outside capsule by at least this much
+    //     return playerRadius + skin + objectRadiusScaled + minDistance;
+    // }
 
     private void SetIgnorePlayerCollisions(HoldableV2 holdable, bool ignore)
     {
