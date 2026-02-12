@@ -3,61 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags:
-  - Anchor
-  - QDSUISection
-  - QDSUIAccentColor
-  - QDSUISecondaryButton
-  - QDSUIPrimaryButton
-  - QDSUITextSecondaryInvertedColor
-  - QDSUITextInvertedColor
-  - QDSUIToggleButton
-  - QDSUIIcon
-  - QDSUITextSecondaryColor
-  - QDSUIDestructiveButton
-  - QDSUISharedThemeColor
-  - QDSUIBorderlessButton
-  - QDSUIToggleBorderlessButton
-  - QDSUIBackplateGradient
-  - QDSUITooltip
-  - QDSUIToggleSwitch
-  - PassThroughButton
-  - PassThrough
-  - Locomotion
-  - LocoButton
-  - LocoText
-  - QDSUITextInputField
-  - SamplesInfoPanel
-  - QDSUIToggleCheckboxRadio
+  tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - 
   - Water
   - UI
-  - Grabbable
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  - HeldObject
-  - Player
-  - 
-=======
-  - Post-Procesing_Volume
-  - HeldObject
-  - Player
->>>>>>> Stashed changes
-=======
-  - Post-Procesing_Volume
-  - HeldObject
-  - Player
->>>>>>> Stashed changes
-=======
-  - Post-Procesing_Volume
-  - HeldObject
-  - Player
->>>>>>> Stashed changes
   - 
   - 
   - 
@@ -78,7 +31,11 @@ TagManager:
   - 
   - 
   - 
-  - XR Simulation
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   m_SortingLayers:
   - name: Default
@@ -86,10 +43,3 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
-  - Light Layer 1
-  - Light Layer 2
-  - Light Layer 3
-  - Light Layer 4
-  - Light Layer 5
-  - Light Layer 6
-  - Light Layer 7
