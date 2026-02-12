@@ -3,75 +3,20 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-<<<<<<< Updated upstream
-  tags: []
-=======
   tags:
   - Anchor
-  - QDSUISection
-  - QDSUIAccentColor
-  - QDSUISecondaryButton
-  - QDSUIPrimaryButton
-  - QDSUITextSecondaryInvertedColor
-  - QDSUITextInvertedColor
-  - QDSUIToggleButton
-  - QDSUIIcon
-  - QDSUITextSecondaryColor
-  - QDSUIDestructiveButton
-  - QDSUISharedThemeColor
-  - QDSUIBorderlessButton
-  - QDSUIToggleBorderlessButton
-  - QDSUIBackplateGradient
-  - QDSUITooltip
-  - QDSUIToggleSwitch
-  - PassThroughButton
-  - PassThrough
-  - Locomotion
-  - LocoButton
-  - LocoText
-  - QDSUITextInputField
-  - SamplesInfoPanel
-  - QDSUIToggleCheckboxRadio
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - QDSUISection
   - Water
   - UI
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  - 
-  - 
-  - 
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+  - Holdable
   - Grabbable
-  - Post-Procesing_Volume
   - HeldObject
   - Player
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-  - 
-  - 
-=======
->>>>>>> Stashed changes
-  - 
-  - 
-=======
->>>>>>> Stashed changes
+  - Post-Procesing_Volume
   - 
   - 
   - 
@@ -90,6 +35,8 @@ TagManager:
   - 
   - 
   - 
+  - 
+  - XR Simulation
   - 
   m_SortingLayers:
   - name: Default
@@ -97,3 +44,5 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
+
+
