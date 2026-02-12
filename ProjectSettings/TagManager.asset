@@ -32,6 +32,9 @@ TagManager:
   - QDSUITextInputField
   - SamplesInfoPanel
   - QDSUIToggleCheckboxRadio
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   layers:
   - Default
@@ -41,17 +44,23 @@ TagManager:
   - Water
   - UI
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   - 
   - 
   - 
 =======
+=======
+>>>>>>> Stashed changes
   - Grabbable
   - Post-Procesing_Volume
   - HeldObject
   - Player
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
   - 
   - 
+=======
+>>>>>>> Stashed changes
   - 
   - 
   - 
