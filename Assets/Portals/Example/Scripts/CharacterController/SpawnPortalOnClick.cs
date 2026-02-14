@@ -31,11 +31,19 @@ public class SpawnPortalOnClick : MonoBehaviour {
     [SerializeField] float _portalWaveAmplitude = 0.2f;
     [SerializeField] float _portalWaveDuration = 0.5f;
 
+    [Header("Right Portal Placement")]
+    [SerializeField] Transform _rightPortalSpawn;
+
     Portal _leftPortal;
     Portal _rightPortal;
     private bool isRightPortalActive = false;
     public void ActivatePortals() {
         isRightPortalActive = true;
+    }
+
+    public void DespawnPortals() {
+        _leftPortal?.gameObject.SetActive(false);
+        _rightPortal?.gameObject.SetActive(false);
     }
 
     void Awake() {
@@ -59,7 +67,14 @@ public class SpawnPortalOnClick : MonoBehaviour {
         _rightPortal.name = "Right Portal";
 
         _leftPortal.gameObject.SetActive(false);
-        _rightPortal.gameObject.SetActive(false);
+
+        if (_rightPortalSpawn != null) {
+            _rightPortal.transform.position = _rightPortalSpawn.position;
+            _rightPortal.transform.rotation = _rightPortalSpawn.rotation;
+            _rightPortal.gameObject.SetActive(true);
+        } else {
+            _rightPortal.gameObject.SetActive(false);
+        }
 
     }
 
