@@ -147,29 +147,18 @@ public class SpawnPortalOnClick : MonoBehaviour {
         // Portals on walls should be upright, portals on the ground can be rotated in any way.
         Quaternion rotation = CalculateRotation(_camera.transform.forward, hit.normal);
 
-        // Set portal position and rotation. Need to do this before calling FindFit so we can get
-        // the portal's corners in world space
         portal.transform.position = hit.point;
         portal.transform.rotation = rotation;
 
-        // Make sure the portal can fit flushly on the object we've hit.
-        // If it can fit, but it's hanging off the edge, push it in.
-        // Otherwise, disable the portal.
-        Vector3 newPosition;
-        portal.gameObject.SetActive(false);
-        if (FindFit(portal, hit.collider, out newPosition)) {
-            portal.transform.position = newPosition + hit.normal * _normalOffset;
-            portal.IgnoredColliders = new Collider[] { hit.collider };
-            portal.gameObject.SetActive(true);
+        portal.transform.position = portal.transform.position + hit.normal * _normalOffset;
+        portal.IgnoredColliders = new Collider[] { hit.collider };
+        portal.gameObject.SetActive(true);
 
-            // Scale the portal's renderer up from 0 to 1 for a nice visual pop-in
-            Renderer portalRenderer = portal.GetComponentInChildren<MeshRenderer>();
-            SetScaleOverTime(portalRenderer.transform, Vector3.zero, Vector3.one, _portalSpawnCurve, _portalSpawnTime);
+        // Scale the portal's renderer up from 0 to 1 for a nice visual pop-in
+        Renderer portalRenderer = portal.GetComponentInChildren<MeshRenderer>();
+        SetScaleOverTime(portalRenderer.transform, Vector3.zero, Vector3.one, _portalSpawnCurve, _portalSpawnTime);
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     Portal SpawnPortal(Vector3 location, Quaternion rotation, Color color) {

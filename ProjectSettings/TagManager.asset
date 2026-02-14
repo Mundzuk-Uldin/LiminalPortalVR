@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Anchor
+  - PortalSurface
   layers:
   - Default
   - TransparentFX
