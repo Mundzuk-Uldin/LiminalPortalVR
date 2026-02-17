@@ -164,7 +164,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: e5753b6ceeec243a68223a3057d48168, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.374
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -175,7 +175,7 @@ AudioSource:
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -208,7 +208,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -375,6 +375,37 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &957446469
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 957446470}
+  m_Layer: 0
+  m_Name: Pyramid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &957446470
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 957446469}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 267.04553, y: 128.71748, z: 315.08307}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1504088421
 GameObject:
   m_ObjectHideFlags: 0
@@ -400,7 +431,7 @@ Transform:
   m_GameObject: {fileID: 1504088421}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 267.0454, y: 128.71748, z: 315.08298}
+  m_LocalPosition: {x: 342, y: 0.389, z: 751}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -510,15 +541,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2378200314555039616, guid: 64566c7fb55dc4e61ab85ee2339f36cb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 488.8
+      value: 763
       objectReference: {fileID: 0}
     - target: {fileID: 2378200314555039616, guid: 64566c7fb55dc4e61ab85ee2339f36cb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.96
+      value: 4.4
       objectReference: {fileID: 0}
     - target: {fileID: 2378200314555039616, guid: 64566c7fb55dc4e61ab85ee2339f36cb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 504.32
+      value: 311
       objectReference: {fileID: 0}
     - target: {fileID: 2378200314555039616, guid: 64566c7fb55dc4e61ab85ee2339f36cb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -565,3 +596,4 @@ SceneRoots:
   - {fileID: 1898532567}
   - {fileID: 1951673657}
   - {fileID: 1504088422}
+  - {fileID: 957446470}
