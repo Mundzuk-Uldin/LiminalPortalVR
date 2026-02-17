@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 114081584473201222}
   m_Layer: 0
   m_Name: ExamplePlayer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -499,6 +499,7 @@ MonoBehaviour:
   _meshColliderIterationCount: 10
   _portalWaveAmplitude: 0.2
   _portalWaveDuration: 0.5
+  _rightPortalSpawn: {fileID: 0}
 --- !u!114 &114081584473201222
 MonoBehaviour:
   m_ObjectHideFlags: 0

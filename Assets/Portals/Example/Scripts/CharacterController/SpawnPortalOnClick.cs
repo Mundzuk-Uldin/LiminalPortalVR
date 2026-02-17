@@ -31,8 +31,20 @@ public class SpawnPortalOnClick : MonoBehaviour {
     [SerializeField] float _portalWaveAmplitude = 0.2f;
     [SerializeField] float _portalWaveDuration = 0.5f;
 
+    [Header("Right Portal Placement")]
+    [SerializeField] Transform _rightPortalSpawn;
+
     Portal _leftPortal;
     Portal _rightPortal;
+    private bool isRightPortalActive = false;
+    public void ActivatePortals() {
+        isRightPortalActive = true;
+    }
+
+    public void DespawnPortals() {
+        _leftPortal?.gameObject.SetActive(false);
+        _rightPortal?.gameObject.SetActive(false);
+    }
 
     void Awake() {
         if (!isActiveAndEnabled) {
@@ -55,7 +67,14 @@ public class SpawnPortalOnClick : MonoBehaviour {
         _rightPortal.name = "Right Portal";
 
         _leftPortal.gameObject.SetActive(false);
-        _rightPortal.gameObject.SetActive(false);
+
+        if (_rightPortalSpawn != null) {
+            _rightPortal.transform.position = _rightPortalSpawn.position;
+            _rightPortal.transform.rotation = _rightPortalSpawn.rotation;
+            _rightPortal.gameObject.SetActive(true);
+        } else {
+            _rightPortal.gameObject.SetActive(false);
+        }
 
     }
 
@@ -67,7 +86,7 @@ public class SpawnPortalOnClick : MonoBehaviour {
     void FirePortalPC()
     {
         bool leftClick = Input.GetMouseButtonDown(0);
-        bool rightClick = Input.GetMouseButtonDown(1);
+        bool rightClick = Input.GetMouseButtonDown(1) && isRightPortalActive;
 
         if (leftClick || rightClick) {
             Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
@@ -76,8 +95,8 @@ public class SpawnPortalOnClick : MonoBehaviour {
     }
     void FirePortalVR()
     {
-                bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
-        bool rightClick = OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger);
+        bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
+        bool rightClick = OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger) && isRightPortalActive;
 
         if (leftClick || rightClick) {
             Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
@@ -107,11 +126,13 @@ public class SpawnPortalOnClick : MonoBehaviour {
             Portal portal = hit.collider.GetComponent<Portal>();
             if (portal) {
                 WavePortalOverTime(portal, hit.point, _portalWaveAmplitude, _portalWaveDuration);
-            } else {
+            } else if (hit.collider.CompareTag("PortalSurface")) {
                 bool spawnedPortal = TrySpawnPortal(polarity, hit);
                 if (!spawnedPortal) {
                     SpawnSplashParticles(hit.point, hit.normal, color);
                 }
+            } else {
+                SpawnSplashParticles(hit.point, hit.normal, color);
             }
         }
         
@@ -126,29 +147,18 @@ public class SpawnPortalOnClick : MonoBehaviour {
         // Portals on walls should be upright, portals on the ground can be rotated in any way.
         Quaternion rotation = CalculateRotation(_camera.transform.forward, hit.normal);
 
-        // Set portal position and rotation. Need to do this before calling FindFit so we can get
-        // the portal's corners in world space
         portal.transform.position = hit.point;
         portal.transform.rotation = rotation;
 
-        // Make sure the portal can fit flushly on the object we've hit.
-        // If it can fit, but it's hanging off the edge, push it in.
-        // Otherwise, disable the portal.
-        Vector3 newPosition;
-        portal.gameObject.SetActive(false);
-        if (FindFit(portal, hit.collider, out newPosition)) {
-            portal.transform.position = newPosition + hit.normal * _normalOffset;
-            portal.IgnoredColliders = new Collider[] { hit.collider };
-            portal.gameObject.SetActive(true);
+        portal.transform.position = portal.transform.position + hit.normal * _normalOffset;
+        portal.IgnoredColliders = new Collider[] { hit.collider };
+        portal.gameObject.SetActive(true);
 
-            // Scale the portal's renderer up from 0 to 1 for a nice visual pop-in
-            Renderer portalRenderer = portal.GetComponentInChildren<MeshRenderer>();
-            SetScaleOverTime(portalRenderer.transform, Vector3.zero, Vector3.one, _portalSpawnCurve, _portalSpawnTime);
+        // Scale the portal's renderer up from 0 to 1 for a nice visual pop-in
+        Renderer portalRenderer = portal.GetComponentInChildren<MeshRenderer>();
+        SetScaleOverTime(portalRenderer.transform, Vector3.zero, Vector3.one, _portalSpawnCurve, _portalSpawnTime);
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     Portal SpawnPortal(Vector3 location, Quaternion rotation, Color color) {
