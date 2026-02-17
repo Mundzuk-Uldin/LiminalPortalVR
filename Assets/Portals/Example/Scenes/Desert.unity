@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 4388199}
   - component: {fileID: 4388200}
   m_Layer: 0
-  m_Name: Wind Start (1)
+  m_Name: Wind Path 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -349,7 +349,7 @@ GameObject:
   - component: {fileID: 17980287}
   - component: {fileID: 17980288}
   m_Layer: 0
-  m_Name: Wind
+  m_Name: Wind Path 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -364,7 +364,7 @@ Transform:
   m_GameObject: {fileID: 17980286}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 342, y: 0, z: 759.04}
+  m_LocalPosition: {x: 344.25, y: 0, z: 754.79}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1014,7 +1014,7 @@ GameObject:
   - component: {fileID: 295321432}
   - component: {fileID: 295321433}
   m_Layer: 0
-  m_Name: Wind Start (2)
+  m_Name: Wind Path 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1362,14 +1362,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 957446469}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.53729963, z: 0, w: 0.8433915}
-  m_LocalPosition: {x: 339.52, y: 0, z: 757.8}
+  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: 343.2, y: 0, z: 754.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 75179371}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 65, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
 --- !u!43 &1033014703
 Mesh:
   m_ObjectHideFlags: 0
@@ -1643,7 +1643,7 @@ GameObject:
   - component: {fileID: 1192977291}
   - component: {fileID: 1192977292}
   m_Layer: 0
-  m_Name: Wind Start
+  m_Name: Wind Path 0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1946,7 +1946,7 @@ GameObject:
   - component: {fileID: 1325498130}
   - component: {fileID: 1325498131}
   m_Layer: 0
-  m_Name: Wind Start (3)
+  m_Name: Wind Path 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2375,17 +2375,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1891329243}
-  m_LocalRotation: {x: 0, y: 0.53729963, z: 0, w: 0.8433915}
-  m_LocalPosition: {x: 0, y: 0, z: 749.18}
+  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: 0, y: 0, z: 732}
   m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1689434944}
   m_Father: {fileID: 526450300}
-  m_LocalEulerAnglesHint: {x: 0, y: 65, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 316.22, y: 2}
+  m_AnchoredPosition: {x: 322.1, y: 2}
   m_SizeDelta: {x: 404.9, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1891329245
@@ -2445,7 +2445,7 @@ GameObject:
   - component: {fileID: 1895914596}
   - component: {fileID: 1895914597}
   m_Layer: 0
-  m_Name: Wind Start (4)
+  m_Name: Wind Path 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
