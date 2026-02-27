@@ -260,8 +260,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
   m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
+  m_RequiresDepthTextureOption: 1
+  m_RequiresOpaqueTextureOption: 1
   m_CameraType: 0
   m_Cameras: []
   m_RendererIndex: -1
@@ -499,7 +499,6 @@ MonoBehaviour:
   _meshColliderIterationCount: 10
   _portalWaveAmplitude: 0.2
   _portalWaveDuration: 0.5
-  _rightPortalSpawn: {fileID: 0}
 --- !u!114 &114081584473201222
 MonoBehaviour:
   m_ObjectHideFlags: 0

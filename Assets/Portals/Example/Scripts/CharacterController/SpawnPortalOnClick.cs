@@ -31,20 +31,8 @@ public class SpawnPortalOnClick : MonoBehaviour {
     [SerializeField] float _portalWaveAmplitude = 0.2f;
     [SerializeField] float _portalWaveDuration = 0.5f;
 
-    [Header("Right Portal Placement")]
-    [SerializeField] Transform _rightPortalSpawn;
-
     Portal _leftPortal;
     Portal _rightPortal;
-    private bool isRightPortalActive = false;
-    public void ActivatePortals() {
-        isRightPortalActive = true;
-    }
-
-    public void DespawnPortals() {
-        _leftPortal?.gameObject.SetActive(false);
-        _rightPortal?.gameObject.SetActive(false);
-    }
 
     void Awake() {
         if (!isActiveAndEnabled) {
@@ -67,14 +55,7 @@ public class SpawnPortalOnClick : MonoBehaviour {
         _rightPortal.name = "Right Portal";
 
         _leftPortal.gameObject.SetActive(false);
-
-        if (_rightPortalSpawn != null) {
-            _rightPortal.transform.position = _rightPortalSpawn.position;
-            _rightPortal.transform.rotation = _rightPortalSpawn.rotation;
-            _rightPortal.gameObject.SetActive(true);
-        } else {
-            _rightPortal.gameObject.SetActive(false);
-        }
+        _rightPortal.gameObject.SetActive(false);
 
     }
 
@@ -86,7 +67,7 @@ public class SpawnPortalOnClick : MonoBehaviour {
     void FirePortalPC()
     {
         bool leftClick = Input.GetMouseButtonDown(0);
-        bool rightClick = Input.GetMouseButtonDown(1) && isRightPortalActive;
+        bool rightClick = Input.GetMouseButtonDown(1);
 
         if (leftClick || rightClick) {
             Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
@@ -95,8 +76,8 @@ public class SpawnPortalOnClick : MonoBehaviour {
     }
     void FirePortalVR()
     {
-        bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
-        bool rightClick = OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger) && isRightPortalActive;
+                bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
+        bool rightClick = OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger);
 
         if (leftClick || rightClick) {
             Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
@@ -126,13 +107,11 @@ public class SpawnPortalOnClick : MonoBehaviour {
             Portal portal = hit.collider.GetComponent<Portal>();
             if (portal) {
                 WavePortalOverTime(portal, hit.point, _portalWaveAmplitude, _portalWaveDuration);
-            } else if (hit.collider.CompareTag("PortalSurface")) {
+            } else {
                 bool spawnedPortal = TrySpawnPortal(polarity, hit);
                 if (!spawnedPortal) {
                     SpawnSplashParticles(hit.point, hit.normal, color);
                 }
-            } else {
-                SpawnSplashParticles(hit.point, hit.normal, color);
             }
         }
         
