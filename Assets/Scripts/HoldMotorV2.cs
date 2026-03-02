@@ -27,13 +27,20 @@ public class HoldMotorV2 : MonoBehaviour
     // [SerializeField] private bool enableScaling;
     [SerializeField] private bool forcedPerspectiveEnabled = true;
 
-    [SerializeField] private float backstep = 0.02f;
-    [SerializeField] private int maxBacksteps = 120;
+    // [SerializeField] private float backstep = 0.02f;
+    // [SerializeField] private int maxBacksteps = 120;
     [SerializeField] private float minDistance = 0.25f; // prevents pulling behind/into camera
 
-    // [SerializeField] private float extraPlayerPadding = 0.05f;
+    [SerializeField] private float wallClearance = 0.05f; // 5 cm leeway
 
-    private float maxRayDistance = 500;
+
+    // [SerializeField] private float extraPlayerPadding = 0.05f;
+    private int heldLayer;
+
+    private float boundsBaseScale;
+
+
+    [SerializeField] private float maxRayDistance = 100;
     // [SerializeField] private bool allowForcedPerspective;
 
     private HoldableV2 current;
@@ -58,7 +65,7 @@ public class HoldMotorV2 : MonoBehaviour
 
         grabbableMask = LayerMask.GetMask("Grabbable");
         int playerLayer = LayerMask.NameToLayer("Player");
-        int heldLayer   = LayerMask.NameToLayer("HeldObject");
+        heldLayer   = LayerMask.NameToLayer("HeldObject");
 
         overlapMask = ~( (1 << playerLayer) | (1 << heldLayer) );
     }
@@ -72,6 +79,7 @@ public class HoldMotorV2 : MonoBehaviour
 
         if (current == null)
         {
+            
             CleanupHold();
             return;
         }
@@ -107,12 +115,10 @@ public class HoldMotorV2 : MonoBehaviour
     {
         if (IsHolding) return;
         if (playerCamera == null) return;
-        // print("starting hold");
 
         Ray ray = new Ray(GetRayOrigin(), GetRayDirection());
 
 
-        // print("player pos:" + playerCamera.transform.position.ToString());
         if (!Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance, grabbableMask, triggerInteraction))
             return;
 
@@ -130,51 +136,65 @@ public class HoldMotorV2 : MonoBehaviour
     {
         if (holdable == null) return;
         if (IsHolding) return;
-        print("does it hit anything? " + holdable.name.ToString());
 
         current = holdable;
         holdable.Bind();
+        current.SetLayerHeld(heldLayer);
 
         grabbedLocalPoint = holdable.HeldTransform.InverseTransformPoint(hitPoint);
-        holdDistance = Vector3.Distance(
-            GetRayOrigin(),
-            hitPoint
-        );
+
+
         rotationOffset =
             Quaternion.Inverse(GetRayRotation()) *
             holdable.HeldTransform.rotation;
 
+        // After grabbedLocalPoint and rotationOffset are set:
 
-        initialHoldDistance = holdDistance;
-        if (initialHoldDistance < 0.0001f) initialHoldDistance = 0.0001f;
+        Quaternion desiredRotationNow = GetRayRotation() * rotationOffset;
+
+
+        // World offset from pivot to grabbed point (at current rotation)
+        Vector3 worldGrabOffsetNow = desiredRotationNow * grabbedLocalPoint;
+
+        // Current world position of the grabbed point
+        Vector3 grabbedPointWorldNow = current.HeldTransform.position + worldGrabOffsetNow;
+
+        // Project that grabbed point onto the ray to get the hold distance that causes NO snap
+        Ray rayNow = new Ray(GetRayOrigin(), GetRayDirection());
+        holdDistance = Vector3.Dot(grabbedPointWorldNow - rayNow.origin, rayNow.direction);
+
+        initialHoldDistance =  holdDistance; //for test
+
+
+        if (initialHoldDistance < current.minScale) initialHoldDistance = current.minScale;
 
         initialLocalScale = current.LocalScale; // your HoldableV2 getter
 
-        // Combine all collider bounds in WORLD space
-        Collider[] cols = current.HeldColliders;
-        Bounds worldBounds = cols[0].bounds;
-        for (int i = 1; i < cols.Length; i++)
-            worldBounds.Encapsulate(cols[i].bounds);
+        ///the change:
+        // Use first BoxCollider as source of true local OBB data
+        BoxCollider box = current.HeldColliders[0] as BoxCollider;
 
-        // Convert bounds center into LOCAL space
-        localBoundsCenter =
-            current.HeldTransform.InverseTransformPoint(worldBounds.center);
+        if (box == null)
+        {
+            // Debug.LogError("Held object does not have a BoxCollider as first collider.");
+            return;
+        }
 
-        // Convert extents into LOCAL-ish space (uniform scale assumption)
-        float s = current.LocalScale.x;
-        if (s < 0.0001f) s = 0.0001f;
+        // True local center (already in local space)
+        localBoundsCenter = box.center;
 
-        localBoundsExtents = worldBounds.extents / s;
+        // True local half extents
+        localBoundsExtents = box.size * 0.5f;
 
-        print("does it hit anything? " + holdable.name.ToString());
-        print("are we holding? " + IsHolding.ToString());
-        // currentOriginalLayer = holdable.gameObject.layer;
+        // Store base scale
+        boundsBaseScale = current.LocalScale.x;
+
 
         current.DisablePlayerCollision(GetPlayerColliders());
         current.DisablePhysicsForHold();
 
-        
-
+        var t = current.HeldTransform;
+        // Debug.Log($"[HoldStart] localScale={t.localScale} lossyScale={t.lossyScale}");
     }
 
     private void KeepHold()
@@ -188,7 +208,8 @@ public class HoldMotorV2 : MonoBehaviour
         Quaternion desiredRotation = GetRayRotation() * rotationOffset;
 
         if(ShouldForcePerspectiveScale()){
-            
+            // Debug.Log($"[before apply] localpos={current.Position}");
+
             ApplyForcedPerspective(ray, desiredRotation);
         } else
         {
@@ -196,19 +217,12 @@ public class HoldMotorV2 : MonoBehaviour
             Vector3 desiredGrabPoint =
                 ray.origin + ray.direction * holdDistance;
 
-            // 4) Convert local grab point back into world space
-            Vector3 worldGrabOffset =
-                desiredRotation * grabbedLocalPoint;
+            float s = current.LocalScale.x; // assume uniform scale
+            Vector3 worldGrabOffset = desiredRotation * (grabbedLocalPoint * s);
+            Vector3 desiredPosition = desiredGrabPoint - worldGrabOffset;
 
-            // 5) Compute final object position
-            Vector3 desiredPosition =
-                desiredGrabPoint - worldGrabOffset;
-
-            // 6) Apply pose
-            // current.SetPosition(desiredPosition);
-            // current.SetRotation(desiredRotation);
-            // current.SetPoseSmooth(desiredPosition, desiredRotation);
             current.StepPose_Tight(desiredPosition, desiredRotation);
+
         }
 
         
@@ -216,120 +230,69 @@ public class HoldMotorV2 : MonoBehaviour
 
     private void ApplyForcedPerspective(Ray ray, Quaternion desiredRotation)
     {
-        // 1) Find the front-most solid point in front of the player
-        // float targetDistance = GetWallHitDistance(ray);
-        // if (targetDistance < minDistance) targetDistance = minDistance;
-
-        // float testDistance = targetDistance;
-
-        // print("are we scalin? " + testDistance);
 
         float hi = GetWallHitDistance(ray);
 
         if (hi < minDistance) hi = minDistance;
 
-        // print("are we scalin? " + hi);
-
         float lo = minDistance;
-        
-        float playerMin = GetPlayerMinHoldDistance(); 
+
+        float playerMin = GetPlayerMinHoldDistance();
         lo = Mathf.Max(lo, playerMin);
         hi = Mathf.Max(hi, playerMin);
 
-        if (hi <= lo + 0.0001f)
-        {
-            // Range collapsed to the minimum safe distance.
-            // We'll just test lo below (your existing lo test handles overlap).
+        if (hi <= lo + 0.001f)
             hi = lo;
+
+        // --- helper local function (keeps this readable) ---
+        bool TestAt(float dist, out Vector3 pos, out Vector3 scale)
+
+        {
+            scale = GetDesiredScale(dist);
+            float absScale = scale.x;                    // ABS scale used for pose glue
+
+            Vector3 grabPoint = ray.origin + ray.direction * dist;
+
+            // Glue offset MUST use absolute scale (not relative)
+            Vector3 offset = desiredRotation * (grabbedLocalPoint * absScale);
+
+            pos = grabPoint - offset;
+            return !IsOverlapping(pos, desiredRotation, absScale);
         }
-        // First ensure lo is actually free. If not, don't move this frame.
-        Vector3 loScale = GetDesiredScale(lo);
-        float loFactor = loScale.x / initialLocalScale.x;
 
-        Vector3 loGrabPoint = ray.origin + ray.direction * lo;
-        Vector3 loOffset = desiredRotation * (grabbedLocalPoint * loFactor);
-        Vector3 loPos = loGrabPoint - loOffset;
-        // print("step 1");
+        // 1) ensure lo is valid
+        if (!TestAt(lo, out Vector3 loPos,  out Vector3 loScale))
+            return;
 
-        if (IsOverlapping(loPos, desiredRotation, loFactor))
-            return; // nowhere valid to place
-        
-        // print("step 2");
-        // Binary search for closest valid position
-        float best = lo;
+        // float best = lo;
+        Vector3 bestPos = loPos;
+        Vector3 bestScale = loScale;
 
         for (int i = 0; i < 12; i++) // 12 iterations is plenty
         {
             float mid = (lo + hi) * 0.5f;
 
-            Vector3 midScale = GetDesiredScale(mid);
-            float midFactor = midScale.x / initialLocalScale.x;
 
-            Vector3 midGrabPoint = ray.origin + ray.direction * mid;
-            Vector3 midOffset = desiredRotation * (grabbedLocalPoint * midFactor);
-            Vector3 midPos = midGrabPoint - midOffset;
 
-            if (IsOverlapping(midPos, desiredRotation, midFactor))
+            if (TestAt(mid, out Vector3 midPos, out Vector3 midScale))
             {
-                // too close; back off
-                hi = mid;
+                // best = mid;
+                bestPos = midPos;
+                bestScale = midScale;
+                lo = mid;     // valid → try closer to wall
             }
             else
             {
-                // valid; try closer
-                best = mid;
-                lo = mid;
+                
+                hi = mid;     // invalid → back off toward player
             }
         }
 
-        print("step 3");
-        Vector3 finalScale = GetDesiredScale(best);
-        float finalFactor = finalScale.x / initialLocalScale.x;
-
-        Vector3 finalGrabPoint = ray.origin + ray.direction * best;
-        Vector3 finalOffset = desiredRotation * (grabbedLocalPoint * finalFactor);
-        Vector3 finalPos = finalGrabPoint - finalOffset;
-
-        print("did we even get here?");
-        current.SetLocalScale(finalScale);
-        // current.SetPosition(finalPos);
-        // current.SetRotation(desiredRotation);
-        current.StepPose_Tight(finalPos, desiredRotation);
-        /*
-        for (int i = 0; i < maxBacksteps; i++)
-        {
-            // 2) Determine scale at this distance (uniform)
-            Vector3 desiredScale = GetDesiredScale(testDistance);
-
-            // uniform scale factor (assumes your initialLocalScale is uniform)
-            float scaleFactor = desiredScale.x / initialLocalScale.x;
-
-            // 3) Where should the grabbed point be on the ray at this distance?
-            Vector3 desiredGrabPoint = ray.origin + ray.direction * testDistance;
-
-            // 4) Compute position that keeps the grabbed point glued (rotation + scale)
-            Vector3 worldGrabOffset = desiredRotation * (grabbedLocalPoint * scaleFactor);
-            Vector3 desiredPosition = desiredGrabPoint - worldGrabOffset;
-
-            // 5) Collision safety: if overlapping, step back and try again
-            if (IsOverlapping(desiredPosition, desiredRotation, scaleFactor))
-            {
-                testDistance -= backstep;
-                if (testDistance < minDistance) break;
-                continue;
-            }
-
-            // 6) Apply scale + pose (this path owns both)
-            current.SetLocalScale(desiredScale);
-            current.SetPosition(desiredPosition);
-            current.SetRotation(desiredRotation);
-            return;
-        }
-        //*/
-
-        // fallback: couldn't find a valid non-overlapping placement
-        // do nothing (keeps last frame pose) or clamp to minDistance if you prefer
+        // 3) apply final pose + scale
+        current.StepPose_Tight(bestPos, desiredRotation);
+        current.SetLocalScale(bestScale);
     }
+    //*/
 
     private float GetWallHitDistance(Ray ray)
     {
@@ -365,7 +328,6 @@ public class HoldMotorV2 : MonoBehaviour
         
         for (int i = 0; i < hits.Length; i++)
         {
-            Debug.Log("Overlap hit: " + hits[i].name + " layer=" + LayerMask.LayerToName(hits[i].gameObject.layer));
             if (hits[i] == null) continue;
 
             // Ignore self colliders
@@ -379,40 +341,6 @@ public class HoldMotorV2 : MonoBehaviour
     }
 
 
-    /* old IsOverlapping
-    private bool IsOverlapping(Vector3 testPosition, Quaternion testRotation)
-    {
-        Bounds b = GetHeldWorldBounds();
-
-        Vector3 halfExtents = b.extents;
-
-        // NOTE: b.center is based on current pose; we need center at test pose.
-        // We'll compute offset from current object position to bounds center.
-        Vector3 centerOffset = b.center - current.Position;
-        Vector3 testCenter = testPosition + centerOffset;
-
-        Collider[] hits = Physics.OverlapBox(
-            testCenter,
-            halfExtents,
-            testRotation,
-            overlapMask,
-            QueryTriggerInteraction.Ignore
-        );
-
-        // Ignore self-colliders
-        for (int i = 0; i < hits.Length; i++)
-        {
-            if (hits[i] == null) continue;
-
-            // if the hit is part of the current held object, ignore it
-            if (hits[i].transform.IsChildOf(current.HeldTransform)) continue;
-
-            return true;
-        }
-
-        return false;
-    }
-    //*/
     private Bounds GetHeldWorldBounds()
     {
         Collider[] cols = current.HeldColliders;
@@ -432,13 +360,15 @@ public class HoldMotorV2 : MonoBehaviour
     }
     public void EndHold()
     {
+        var t = current.HeldTransform;
+        // Debug.Log($"[HoldEnd] localScale={t.localScale} lossyScale={t.lossyScale}");
+        // Debug.Log($"[HoldEnd] localpos={current.Position}");
         if (current == null) return;
+        current.RestoreLayer();
 
         current.EnablePhysicsAfterHold();
         current.EnablePlayerCollision(GetPlayerColliders());
-        // current.OnRelease();
         CleanupHold();
-        print("are we holding? " + IsHolding.ToString());
     }
 
     private bool ShouldForcePerspectiveScale()
@@ -457,27 +387,11 @@ public class HoldMotorV2 : MonoBehaviour
         float playerRadius = characterController != null ? characterController.radius : 0.35f;
         float skin = characterController != null ? characterController.skinWidth : 0.02f;
 
-        // Conservative: use current object radius at current scale.
-        // If your scale is uniform and you have current scale available, multiply it here.
         float objRadius = current.GetCollisionRadius();
 
-        return playerRadius + skin + objRadius; // + playerPadding;
+        return playerRadius + skin + objRadius; 
     }
 
-    // private float GetMinHoldDistance(float objectRadiusScaled)
-    // {
-    //     float playerRadius = 0.35f; // fallback
-    //     float skin = 0.02f;
-
-    //     if (characterController != null)
-    //     {
-    //         playerRadius = characterController.radius;
-    //         skin = characterController.skinWidth;
-    //     }
-
-    //     // Keep held object outside capsule by at least this much
-    //     return playerRadius + skin + objectRadiusScaled + minDistance;
-    // }
 
     private void SetIgnorePlayerCollisions(HoldableV2 holdable, bool ignore)
     {

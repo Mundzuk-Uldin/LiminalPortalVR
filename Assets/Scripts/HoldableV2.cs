@@ -9,13 +9,14 @@ public class HoldableV2 : MonoBehaviour
     [SerializeField] private bool allowForcedPerspective = true;
 
         [Header("Hold Limits")]
-    public float minDistance = 0.5f;
-    public float maxDistance = 20f;
+    // public float minDistance = 0.5f;
+    // public float maxDistance = 20f;
     public float minScale = 0.1f;
     public float maxScale = 10f;
     public float surfacePadding = 0.05f;
 
-
+    private int[] originalLayers;
+    private Transform[] cachedTransforms;
     //     // Tune these in inspector or constants — your call.
     // [SerializeField] float snapDistance = 0.02f;   // 2 cm: snap when close
     // [SerializeField] float maxSpeed = 25f;         // units/sec, increase for “more grabby”
@@ -59,7 +60,7 @@ public class HoldableV2 : MonoBehaviour
             heldColliders = GetComponentsInChildren<Collider>();
 
         isBound = true;
-        Debug.Log($"HeldTransform={heldTransform.name}, RBTransform={heldRigidbody.transform.name}, same={heldTransform==heldRigidbody.transform}");
+        Debug.Log($" starting bind:\nHeldTransform={heldTransform.name}, RBTransform={heldRigidbody.transform.name}, same={heldTransform==heldRigidbody.transform}");
 
     }
     public void SetRotation(Quaternion rotation)
@@ -76,25 +77,10 @@ public class HoldableV2 : MonoBehaviour
         heldTransform.SetPositionAndRotation(position, rotation);
     }
 
-    public void SetPoseSmooth(Vector3 position, Quaternion rotation)
-    {
-        // 25-60 is a good range; higher = tighter
-        const float follow = 45f;
-
-        float t = 1f - Mathf.Exp(-follow * Time.deltaTime);
-
-        heldRigidbody.MovePosition(Vector3.Lerp(heldTransform.position, position, t));
-        heldRigidbody.MoveRotation(Quaternion.Slerp(heldTransform.rotation, rotation, t));
-        // heldTransform.SetPositionAndRotation(
-        //     Vector3.Lerp(heldTransform.position, position, t),
-        //     Quaternion.Slerp(heldTransform.rotation, rotation, t)
-        // );
-    }
 
 
     public void SetLocalScale(Vector3 scale)
     {
-        // heldTransform.localScale = scale;
         float s = Mathf.Clamp(scale.x, minScale, maxScale);
         heldTransform.localScale = Vector3.one * s;
     }
@@ -153,7 +139,6 @@ public class HoldableV2 : MonoBehaviour
             return;
         }
 
-        // heldTransform.position = p + (delta / dist) * step;
         heldRigidbody.MovePosition(p + (delta / dist) * step);
     }
 
@@ -185,7 +170,6 @@ public class HoldableV2 : MonoBehaviour
             return;
         }
         heldTransform.rotation = Quaternion.RotateTowards(r, targetRot, maxStep);
-        // heldRigidbody.MoveRotation(Quaternion.RotateTowards(r, targetRot, maxStep));
     }
 
     public void DisablePlayerCollision(Collider[] playerColliders)
@@ -233,7 +217,7 @@ public class HoldableV2 : MonoBehaviour
             }
         }
     }
-
+ 
     public float GetCollisionRadius()
     {
         Collider[] cols = GetComponentsInChildren<Collider>();
@@ -250,6 +234,31 @@ public class HoldableV2 : MonoBehaviour
 
 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public void SetLayerHeld(int heldLayer)
+    {
+        cachedTransforms = HeldTransform.GetComponentsInChildren<Transform>(true);
+        originalLayers = new int[cachedTransforms.Length];
+
+        for (int i = 0; i < cachedTransforms.Length; i++)
+        {
+            originalLayers[i] = cachedTransforms[i].gameObject.layer;
+            cachedTransforms[i].gameObject.layer = heldLayer;
+        }
+    }
+
+    public void RestoreLayer()
+    {
+        if (cachedTransforms == null || originalLayers == null) return;
+
+        for (int i = 0; i < cachedTransforms.Length; i++)
+        {
+            if (cachedTransforms[i] != null)
+                cachedTransforms[i].gameObject.layer = originalLayers[i];
+        }
+
+        cachedTransforms = null;
+        originalLayers = null;
+    }
+
     
 }

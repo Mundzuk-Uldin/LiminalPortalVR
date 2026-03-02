@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 127522645}
   - component: {fileID: 127522644}
   - component: {fileID: 127522643}
-  m_Layer: 3
+  m_Layer: 13
   m_Name: Wall (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,7 +322,7 @@ GameObject:
   - component: {fileID: 271130769}
   - component: {fileID: 271130768}
   - component: {fileID: 271130767}
-  m_Layer: 3
+  m_Layer: 13
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -440,7 +440,7 @@ GameObject:
   - component: {fileID: 355589530}
   - component: {fileID: 355589529}
   - component: {fileID: 355589528}
-  m_Layer: 3
+  m_Layer: 13
   m_Name: Wall (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -549,7 +549,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 442384062}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: groundRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -851,7 +851,7 @@ GameObject:
   - component: {fileID: 839072900}
   - component: {fileID: 839072899}
   - component: {fileID: 839072898}
-  m_Layer: 3
+  m_Layer: 13
   m_Name: Wall (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1038,7 +1038,7 @@ GameObject:
   - component: {fileID: 1497581487}
   - component: {fileID: 1497581486}
   - component: {fileID: 1497581485}
-  m_Layer: 3
+  m_Layer: 13
   m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1331,9 +1331,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1303359373110459066, guid: 0c81f5d587ccd594e866c145e0479dd8, type: 3}
+      propertyPath: maxScale
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1303359373110459066, guid: 0c81f5d587ccd594e866c145e0479dd8, type: 3}
+      propertyPath: minScale
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1303359373110459066, guid: 0c81f5d587ccd594e866c145e0479dd8, type: 3}
+      propertyPath: maxDistance
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1303359373110459066, guid: 0c81f5d587ccd594e866c145e0479dd8, type: 3}
+      propertyPath: allowForcedPerspective
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5111338034541859648, guid: 0c81f5d587ccd594e866c145e0479dd8, type: 3}
       propertyPath: m_Name
       value: cubev2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5111338034541859648, guid: 0c81f5d587ccd594e866c145e0479dd8, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5196629811517162609, guid: 0c81f5d587ccd594e866c145e0479dd8, type: 3}
       propertyPath: m_LocalPosition.x
