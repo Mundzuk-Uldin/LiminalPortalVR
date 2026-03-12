@@ -557,6 +557,11 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!4 &68306251 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2378200314555039616, guid: 64566c7fb55dc4e61ab85ee2339f36cb, type: 3}
+  m_PrefabInstance: {fileID: 1951673657}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &75179370
 GameObject:
   m_ObjectHideFlags: 0
@@ -1574,7 +1579,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1165064452}
   m_LocalRotation: {x: 0, y: -0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 0, z: 370.2}
+  m_LocalPosition: {x: 0, y: 0, z: 347.7}
   m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1583,7 +1588,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -45, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 716.5, y: 2}
+  m_AnchoredPosition: {x: 721.6, y: 2}
   m_SizeDelta: {x: 404.9, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1165064454
@@ -1851,6 +1856,56 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1261557554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1261557556}
+  - component: {fileID: 1261557555}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1261557555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261557554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d8cf44d395fc473b913ecd9515cb6a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FishSpawner
+  fishPrefab: {fileID: 2446271334105567411, guid: 42eafa6a5f7d9f44f889f0c0c14ca4d9, type: 3}
+  fishCount: 10
+  player: {fileID: 68306251}
+  spawnDistance: 10
+  horizontalSpread: 5
+  verticalSpread: 3
+--- !u!4 &1261557556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261557554}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 754.1119, y: 0.54, z: 314.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1286788385
 GameObject:
   m_ObjectHideFlags: 0
@@ -2593,3 +2648,4 @@ SceneRoots:
   - {fileID: 1504088422}
   - {fileID: 957446470}
   - {fileID: 526450300}
+  - {fileID: 1261557556}
