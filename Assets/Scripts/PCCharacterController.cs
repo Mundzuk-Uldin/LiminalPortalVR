@@ -29,7 +29,7 @@ public class PCCharacterController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-
+ 
     void Update()
     {
         Look();

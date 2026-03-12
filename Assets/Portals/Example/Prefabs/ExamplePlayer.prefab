@@ -307,6 +307,8 @@ GameObject:
   - component: {fileID: 114607381220732790}
   - component: {fileID: 114729792132001658}
   - component: {fileID: 114081584473201222}
+  - component: {fileID: 3533549701604080046}
+  - component: {fileID: 2991471951989041781}
   m_Layer: 0
   m_Name: ExamplePlayer
   m_TagString: Player
@@ -515,3 +517,42 @@ MonoBehaviour:
   _camera: {fileID: 20425551759344838}
   _replacementShader: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
   _spawnCloneOnAwake: 1
+--- !u!114 &3533549701604080046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794636696324910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e46db53a4b04f1428f03875f9ea9006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PCGrabberV2
+  holdMotorV2: {fileID: 2991471951989041781}
+  holdToGrab: 1
+  triggerInteraction: 1
+--- !u!114 &2991471951989041781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794636696324910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f96c8372e0028654a9f81bd5197a605b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HoldMotorV2
+  playerCamera: {fileID: 20425551759344838}
+  maxGrabDistance: 5
+  grabbableMask:
+    serializedVersion: 2
+    m_Bits: 0
+  characterController: {fileID: 0}
+  triggerInteraction: 1
+  playerColliders: []
+  forcedPerspectiveEnabled: 1
+  minDistance: 0.25
+  wallClearance: 0.05
+  maxRayDistance: 100
