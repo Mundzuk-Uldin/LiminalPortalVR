@@ -2030,7 +2030,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1165064452}
   m_LocalRotation: {x: 0, y: -0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 0, z: 347.7}
+  m_LocalPosition: {x: 0, y: 0, z: 351.2}
   m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2338,7 +2338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FishSpawner
   fishPrefab: {fileID: 2446271334105567411, guid: 42eafa6a5f7d9f44f889f0c0c14ca4d9, type: 3}
-  fishCount: 2
+  fishCount: 1
   player: {fileID: 68306251}
   pathPoints:
   - {fileID: 1192977291}
@@ -2348,7 +2348,7 @@ MonoBehaviour:
   - {fileID: 17980287}
   spawnDistance: 4
   horizontalSpread: 3
-  verticalSpread: 3
+  verticalSpread: 2
 --- !u!4 &1261557556
 Transform:
   m_ObjectHideFlags: 0
