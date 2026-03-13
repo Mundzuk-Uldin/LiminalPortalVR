@@ -195,6 +195,9 @@ namespace Portals {
         }
 
         public void Jump() {
+            if (!_isGrounded) {
+                return;
+            }
             float scaleFactor = this.transform.localScale.x;
             _rigidbody.AddForce(_movementInfo.jumpForce * 0.25f * scaleFactor * this.UpVector, ForceMode.Acceleration);
         }
