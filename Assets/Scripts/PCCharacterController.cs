@@ -35,7 +35,7 @@ public class PCCharacterController : MonoBehaviour
         Look();
         Move();
     }
-
+ 
     void Look()
     {
         // Mouse delta (pixels per frame)

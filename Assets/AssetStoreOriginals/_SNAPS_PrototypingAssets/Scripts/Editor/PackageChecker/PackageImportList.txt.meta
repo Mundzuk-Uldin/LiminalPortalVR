@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6cd41f7263b4ad84a855f862431f9843
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 137490
+  packageName: Snaps Prototype | Office
+  packageVersion: 1.3
+  assetPath: Assets/AssetStoreOriginals/_SNAPS_PrototypingAssets/Scripts/Editor/PackageChecker/PackageImportList.txt
+  uploadId: 381965

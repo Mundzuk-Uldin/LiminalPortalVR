@@ -31,6 +31,8 @@ public class SpawnPortalOnClick : MonoBehaviour {
     [SerializeField] float _portalWaveAmplitude = 0.2f;
     [SerializeField] float _portalWaveDuration = 0.5f;
 
+    [SerializeField] bool _isPortalPowerUnlocked = true;
+
     Portal _leftPortal;
     Portal _rightPortal;
 
@@ -76,7 +78,7 @@ public class SpawnPortalOnClick : MonoBehaviour {
     }
     void FirePortalVR()
     {
-                bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
+        bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
         bool rightClick = OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger);
 
         if (leftClick || rightClick) {

@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Portals {
     [RequireComponent(typeof(Rigidbody))]
+    // [RequireComponent(typeof(CharacterController))]
     public class RigidbodyCharacterController : MonoBehaviour {
         [System.Serializable]
         public struct MovementInfo {
@@ -34,6 +35,9 @@ namespace Portals {
         private LayerMask _collisionMask = -1;
         [SerializeField]
         private float _rotationalReallignmentRate = 10.0f;
+        
+        public float PlayerRadius => _capsuleCollider.radius * transform.localScale.x;
+        public float SkinWidth => 0.01f * transform.localScale.x;
 
         private Rigidbody _rigidbody;
         private CapsuleCollider _capsuleCollider;

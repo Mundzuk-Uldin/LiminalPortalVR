@@ -11,6 +11,7 @@ public class HoldMotorV2 : MonoBehaviour
     [SerializeField] private LayerMask grabbableMask;
 
     [SerializeField] private CharacterController characterController;
+    [SerializeField] private Portals.RigidbodyCharacterController RigidbodyCharacterController;
 
     [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
 
@@ -384,8 +385,18 @@ public class HoldMotorV2 : MonoBehaviour
 
     private float GetPlayerMinHoldDistance()
     {
-        float playerRadius = characterController != null ? characterController.radius : 0.35f;
-        float skin = characterController != null ? characterController.skinWidth : 0.02f;
+        float playerRadius = 0.35f;
+        float skin = 0.02f;
+        if (characterController != null)
+        {
+            playerRadius = characterController.radius;
+            skin = characterController.skinWidth; 
+        }
+        else if (RigidbodyCharacterController != null)
+        {
+            playerRadius = RigidbodyCharacterController.PlayerRadius;
+            skin = RigidbodyCharacterController.SkinWidth; 
+        }
 
         float objRadius = current.GetCollisionRadius();
 

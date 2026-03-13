@@ -309,6 +309,7 @@ GameObject:
   - component: {fileID: 114081584473201222}
   - component: {fileID: 3533549701604080046}
   - component: {fileID: 2991471951989041781}
+  - component: {fileID: 3592026703474178314}
   m_Layer: 0
   m_Name: ExamplePlayer
   m_TagString: Untagged
@@ -501,6 +502,7 @@ MonoBehaviour:
   _meshColliderIterationCount: 10
   _portalWaveAmplitude: 0.2
   _portalWaveDuration: 0.5
+  _isPortalPowerUnlocked: 1
 --- !u!114 &114081584473201222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -550,9 +552,25 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   characterController: {fileID: 0}
+  RigidbodyCharacterController: {fileID: 114581272516510156}
   triggerInteraction: 1
   playerColliders: []
   forcedPerspectiveEnabled: 1
   minDistance: 0.25
   wallClearance: 0.05
   maxRayDistance: 100
+--- !u!114 &3592026703474178314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794636696324910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c855c3f5486d4184d8b26676aaa7dd39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRGrabberV2
+  holdMotorV2: {fileID: 2991471951989041781}
+  holdToGrab: 1
+  triggerInteraction: 1
