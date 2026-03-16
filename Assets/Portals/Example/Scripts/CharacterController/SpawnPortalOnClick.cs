@@ -399,4 +399,6 @@ public class SpawnPortalOnClick : MonoBehaviour {
         bullet.GetComponent<ParticleSystem>().Stop(true, ParticleSystemStopBehavior.StopEmitting);
         Destroy(bullet, 1.0f);
     }
+
+    public void DespawnPortals(){}
 }

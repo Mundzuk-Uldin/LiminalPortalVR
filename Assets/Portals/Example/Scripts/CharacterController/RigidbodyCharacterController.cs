@@ -67,16 +67,36 @@ namespace Portals {
 
         private void FixedUpdate() {
             DoGroundCheck();
-            FixRotation();
+             if (!UnityEngine.XR.XRSettings.isDeviceActive) FixRotation();
+            // FixRotation();
             ApplyDrag();
         }
 
+        // private void LateUpdate() {
+
+        //     if (UnityEngine.XR.XRSettings.isDeviceActive) {
+        //         _previousHeadRotation = _head.rotation; // keep body alignment using the real headset pose
+        //         _xFrameRotation = 0;
+        //         _yFrameRotation = 0;
+        //         return;
+        //     }
+
+        //     DoHeadRotation(_xFrameRotation, _yFrameRotation);
+        //     _xFrameRotation = 0;
+        //     _yFrameRotation = 0;
+        // }
         private void LateUpdate() {
+            if (UnityEngine.XR.XRSettings.isDeviceActive) {
+                _previousHeadRotation = _head.rotation;
+                _xFrameRotation = 0;
+                _yFrameRotation = 0;
+                return;
+            }
+
             DoHeadRotation(_xFrameRotation, _yFrameRotation);
             _xFrameRotation = 0;
             _yFrameRotation = 0;
         }
-
         private void OnPortalTeleport(Portal portal) {
             _previousHeadRotation = portal.TeleportRotation(_previousHeadRotation);
             _head.GetComponent<Camera>().nearClipPlane *= portal.PortalScaleAverage;
