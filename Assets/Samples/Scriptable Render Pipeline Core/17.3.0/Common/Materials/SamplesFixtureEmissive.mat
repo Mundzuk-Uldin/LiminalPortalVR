@@ -66,7 +66,7 @@ Material:
     - _Falloff_Distance_End: 1.05
     - _Falloff_Distance_Start: 0.5
     - _Falloff_from_UV_center: 1
-    - _Intensity: 250
+    - _Intensity: 110
     - _MaterialID: 1
     - _MaterialTypeMask: 2
     - _Material_Emissive_Multiplier: 0.025
