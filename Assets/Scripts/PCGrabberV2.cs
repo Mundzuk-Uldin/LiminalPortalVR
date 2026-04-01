@@ -38,10 +38,15 @@ public class PCGrabberV2 : MonoBehaviour
 
         private void HandleHoldMode()
     {
-        bool pressed = Mouse.current != null && Mouse.current.leftButton.isPressed;
+        
+        bool pressed = Keyboard.current != null && Keyboard.current.rKey.isPressed;
+
+        // OLD (mouse)
+        // bool pressed = Mouse.current != null && Mouse.current.leftButton.isPressed;
 
         if (pressed)
         {
+            // print("test");
             // If not already holding anything, try to start.
             if (!holdMotorV2.IsHolding)
                holdMotorV2.TryStartHold();
@@ -56,12 +61,16 @@ public class PCGrabberV2 : MonoBehaviour
 
     private void HandleToggleMode()
     {
-        bool clicked = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+        bool clicked = Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame;
+
+        // OLD (mouse)
+        // bool clicked = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
 
         if (!clicked) return;
 
         if (holdMotorV2.IsHolding)
         {
+            // print("test");
             holdMotorV2.EndHold();
             toggledHolding = false;
             return;

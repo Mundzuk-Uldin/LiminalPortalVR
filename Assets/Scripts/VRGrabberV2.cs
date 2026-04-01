@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR;
 
 public class VRGrabberV2 : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class VRGrabberV2 : MonoBehaviour
     [Header("Input")]
     [SerializeField] private bool holdToGrab = true; // true: hold LMB, false: click to toggle
     [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
+    private bool lastRightGrip;
 
     private bool toggledHolding;
     /// <summary>
@@ -34,8 +36,66 @@ public class VRGrabberV2 : MonoBehaviour
             HandleToggleMode();
         }
     }
+    private void HandleHoldMode()
+{
+    bool pressed = false;
 
-        private void HandleHoldMode()
+    // OpenXR: Right grip
+    InputDevice right = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+    if (right.isValid && right.TryGetFeatureValue(CommonUsages.gripButton, out bool rightGrip))
+    {
+        pressed = rightGrip;
+    }
+    // OVR fallback: Right grip
+    else
+    {
+        pressed = OVRInput.Get(OVRInput.Button.SecondaryHandTrigger);
+    }
+
+    if (pressed)
+    {
+        if (!holdMotorV2.IsHolding)
+            holdMotorV2.TryStartHold();
+    }
+    else
+    {
+        if (holdMotorV2.IsHolding)
+            holdMotorV2.EndHold();
+    }
+}
+private void HandleToggleMode()
+{
+    bool pressed = false;
+
+    // OpenXR: Right grip
+    InputDevice right = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+    if (right.isValid && right.TryGetFeatureValue(CommonUsages.gripButton, out bool rightGrip))
+    {
+        pressed = rightGrip;
+    }
+    // OVR fallback: Right grip
+    else
+    {
+        pressed = OVRInput.Get(OVRInput.Button.SecondaryHandTrigger);
+    }
+
+    bool clicked = pressed && !lastRightGrip;
+    lastRightGrip = pressed;
+
+    if (!clicked) return;
+
+    if (holdMotorV2.IsHolding)
+    {
+        holdMotorV2.EndHold();
+        toggledHolding = false;
+        return;
+    }
+
+    holdMotorV2.TryStartHold();
+    toggledHolding = holdMotorV2.IsHolding;
+}
+    /*
+    private void HandleHoldMode()
     {
         bool pressed = OVRInput.Get(OVRInput.Button.One);
 
@@ -52,7 +112,8 @@ public class VRGrabberV2 : MonoBehaviour
                 holdMotorV2.EndHold();
         }
     }
-
+    //*/
+    /*
     private void HandleToggleMode()
     {
         bool clicked = OVRInput.GetDown(OVRInput.Button.One);
@@ -69,7 +130,7 @@ public class VRGrabberV2 : MonoBehaviour
         holdMotorV2.TryStartHold();
         toggledHolding = holdMotorV2.IsHolding;
     }
-
+    //*/
     
 }
 

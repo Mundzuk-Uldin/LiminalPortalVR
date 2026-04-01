@@ -80,7 +80,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 801
+    m_Bits: 15345
   m_RenderingPath: 1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -442,6 +442,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mouseSensitivity: 3
   _snapTurnAngle: 30
+  _movementEnabled: 0
+  _isVRMode: 0
 --- !u!114 &114729792132001658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -547,13 +549,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HoldMotorV2
   playerCamera: {fileID: 20425551759344838}
-  maxGrabDistance: 5
+  maxGrabDistance: 20
   grabbableMask:
     serializedVersion: 2
     m_Bits: 0
   characterController: {fileID: 0}
   RigidbodyCharacterController: {fileID: 114581272516510156}
-  triggerInteraction: 1
+  triggerInteraction: 0
   playerColliders: []
   forcedPerspectiveEnabled: 1
   minDistance: 0.25

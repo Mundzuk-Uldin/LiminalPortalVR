@@ -119,7 +119,7 @@ public class HoldMotorV2 : MonoBehaviour
 
         Ray ray = new Ray(GetRayOrigin(), GetRayDirection());
 
-
+        // print("test");
         if (!Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance, grabbableMask, triggerInteraction))
             return;
 
@@ -129,7 +129,7 @@ public class HoldMotorV2 : MonoBehaviour
 
         HoldableV2 holdable = hit.collider.GetComponentInParent<HoldableV2>();
         if (holdable == null) return;
-
+        // print("test");
         StartHold(holdable, hit.point);
     }
 
@@ -195,7 +195,7 @@ public class HoldMotorV2 : MonoBehaviour
         current.DisablePhysicsForHold();
 
         var t = current.HeldTransform;
-        // Debug.Log($"[HoldStart] localScale={t.localScale} lossyScale={t.lossyScale}");
+        Debug.Log($"[HoldStart] localScale={t.localScale} lossyScale={t.lossyScale}");
     }
 
     private void KeepHold()

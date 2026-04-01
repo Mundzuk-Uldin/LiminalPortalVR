@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Portals;
-
+using static OVRInput;
+using UnityEngine.XR;
 static internal class AnimationCurves {
     public static AnimationCurve Overshoot = new AnimationCurve(new Keyframe[] {
         new Keyframe(0.0f, 0.0f, 0.0f, 0.0f),
@@ -76,6 +77,52 @@ public class SpawnPortalOnClick : MonoBehaviour {
             Fire(polarity);
         }
     }
+    private bool _lastLeftTrigger;
+    private bool _lastRightTrigger;
+
+void FirePortalVR()
+{
+    bool leftClick = false;
+    bool rightClick = false;
+
+    InputDevice left = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
+    InputDevice right = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+
+    //Left trigger  → Blue portal
+    //Right trigger → Red portal
+
+    // LEFT
+    if (left.isValid && left.TryGetFeatureValue(CommonUsages.triggerButton, out bool leftTrigger))
+    {
+        if (leftTrigger && !_lastLeftTrigger)
+            leftClick = true;
+
+        _lastLeftTrigger = leftTrigger;
+    }
+
+    // RIGHT
+    if (right.isValid && right.TryGetFeatureValue(CommonUsages.triggerButton, out bool rightTrigger))
+    {
+        if (rightTrigger && !_lastRightTrigger)
+            rightClick = true;
+
+        _lastRightTrigger = rightTrigger;
+    }
+
+    // OVR fallback (already GetDown)
+    if (!leftClick && OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
+        leftClick = true;
+
+    if (!rightClick && OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger))
+        rightClick = true;
+
+    if (leftClick || rightClick)
+    {
+        Polarity polarity = leftClick ? Polarity.Left : Polarity.Right;
+        Fire(polarity);
+    }
+}
+    /*
     void FirePortalVR()
     {
         bool leftClick = OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger);
@@ -86,7 +133,7 @@ public class SpawnPortalOnClick : MonoBehaviour {
             Fire(polarity);
         }
     }
-
+    //*/
     private enum Polarity {
         Left,
         Right
